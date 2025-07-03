@@ -15,6 +15,7 @@ console.log("Slack read app initialized with signing secret and bot token");
 console.log('Channel ID:', process.env.SLACK_USER_CHANNEL_ID);
 // 10 hours ago in Unix timestamp
 const now = Math.floor(Date.now() / 1000);
+const sometimeAgo = (now - 24 * 60 * 60).toString();
 async function fetchSlackMessages2(token, channelId, limit = 100, names) {
     try {
         let userIds = new Set();
@@ -60,6 +61,7 @@ async function fetchSlackMessages(token, channelId, limit = 100) {
         const result = await app.client.conversations.history({
             channel: channelId,
             limit: limit,
+            oldest: sometimeAgo,
         });
         const messagesText = [];
         if (result.messages) {
@@ -98,12 +100,13 @@ server.registerTool("read-slack-conversations", {
     //  const messages = await getRecentMessages();
     const results = {};
     // const channelIds = ["C093GASKAKF","C093KD45H3N"]; // You can add more channel IDs if needed
-    const channelIds = await getJoinedChannelIds();
-    console.log('Joined channel names:', channelIds);
-    for (const channelId of channelIds) {
+    const channelMap = await getJoinedChannelMap();
+    console.log('Joined channel names:', channelMap);
+    for (const [channelId, channelName] of Object.entries(channelMap)) {
         const messages = await fetchSlackMessages("slackToken", channelId, 100);
         console.log('Messages list:', messages);
-        results[channelId] = messages;
+        const key = `${channelName}(${channelId})`;
+        results[key] = messages;
     }
     // return {
     //       content: [
@@ -117,22 +120,24 @@ server.registerTool("read-slack-conversations", {
         content: [{ type: "text", text: "Reading Slack conversations..." + JSON.stringify(results, null, 2) }]
     });
 });
-async function getJoinedChannelIds() {
+async function getJoinedChannelMap() {
     try {
         const result = await app.client.conversations.list({
-            token: process.env.SLACK_BOT_TOKEN,
             types: 'public_channel,private_channel',
             exclude_archived: true,
         });
         const channels = result.channels ?? [];
-        const joinedChannelIds = channels
-            .filter((channel) => !!channel.is_member && !!channel.id)
-            .map(channel => channel.id);
-        return joinedChannelIds;
+        const joinedChannelMap = {};
+        for (const channel of channels) {
+            if (channel.is_member && channel.id && channel.name) {
+                joinedChannelMap[channel.id] = channel.name;
+            }
+        }
+        return joinedChannelMap;
     }
     catch (error) {
-        console.error('Failed to fetch joined channel IDs:', error);
-        return [];
+        console.error('Failed to fetch joined channels:', error);
+        return {};
     }
 }
 async function getChannelName(channelId) {
