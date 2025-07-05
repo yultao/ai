@@ -1,0 +1,24 @@
+{
+  "name": "my-agent",
+  "version": "1.0.0",
+  "description": "0. 初始化\r npm init -y",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "chalk": "^5.4.1",
+    "dotenv": "^17.0.1",
+    "openai": "^5.8.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

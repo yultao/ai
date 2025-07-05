@@ -5,7 +5,6 @@ import Slack from '@slack/bolt';
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 
-
 const token2: string = process.env.SLACK_USER_TOKEN as string;
 const signingSecret2: string = process.env.SLACK_USER_SIGNING_SECRET as string
 console.log("Slack user token:", token2);

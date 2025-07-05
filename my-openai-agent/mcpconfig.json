@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "disabled": true,
+      "command": "uvx",
+      "args": ["https://leetcode.com/problemset/algorithms/"]
+    },
+    "slack-mcp": {
+      "disabled": true,
+      "command": "node",
+      "args": ["C:/Workspace/ai/slack-mcp-server/build/index.js"]
+    },
+    "file": {
+      "disabled": false,
+      "command": "npx",
+      "args": ["-y",
+         "@modelcontextprotocol/server-filesystem",
+         "C:\\Workspace\\ai\\my-openai-agent\\dist"]
+    }
+  }
+}

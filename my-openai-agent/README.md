@@ -23,12 +23,21 @@ typescript
 npm init -y
 
 1. 安装运行时依赖：
-npm install axios dotenv node express 
+npm install dotenv openai @modelcontextprotocol/sdk chalk
 
 2. 安装开发依赖：
-npm install --save-dev typescript ts-node nodemon @types/node @types/express @types/axios
-
+npm install --save-dev typescript ts-node nodemon @types/node
 3. 初始化 TypeScript 配置
 npx tsc --init
 
+4. 编译
+wrong
+npm run tsc 
+right
+npx tsc 
+
+5. 运行
+node dist/index.js
 ## 临时笔记
+
+conda show current
