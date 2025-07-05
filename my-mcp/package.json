@@ -1,0 +1,24 @@
+{
+  "name": "mcp-lite",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "host/cli.ts",
+  "scripts": {
+    "chat": "node build/host/cli-chat.js",
+    "chat:stdio": "node build/host/cli-stdio-chat.js",
+    "mcp": "ts-node host/cli.ts",
+    "build": "tsc",
+    "start": "ts-node host/http.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "@types/express": "^5.0.3",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
+  }
+}

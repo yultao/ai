@@ -138,3 +138,17 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 slack-mcp-server/build/index.js
+my-mcp/build/agent/MyAgent.d.ts
+my-mcp/build/agent/MyAgent.js
+my-mcp/build/context/buildContext.d.ts
+my-mcp/build/context/buildContext.js
+my-mcp/build/host/cli-chat.d.ts
+my-mcp/build/host/cli-chat.js
+my-mcp/build/host/cli.d.ts
+my-mcp/build/host/cli.js
+my-mcp/build/host/http.d.ts
+my-mcp/build/host/http.js
+my-mcp/build/model/openai.d.ts
+my-mcp/build/model/openai.js
+my-mcp/build/types/index.d.ts
+my-mcp/build/types/index.js
