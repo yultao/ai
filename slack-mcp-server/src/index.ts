@@ -2,6 +2,7 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import Slack from '@slack/bolt';
+import { SlackReader } from "./slack/slack-reader.js";
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 
@@ -127,40 +128,40 @@ server.registerTool("add",
   }
 );
 
-server.registerTool("read-slack-conversations",
-  {
-    title: "Slack Reader",
-    description: "Read Slack Converstaions History"
-  },
-  async (_input, context) => {
+// server.registerTool("read-slack-conversations",
+//   {
+//     title: "Slack Reader",
+//     description: "Read Slack Converstaions History"
+//   },
+//   async (_input, context) => {
+   
+//     const results: Record<string, string[]> = {};
+//     const channelMap = await getJoinedChannelMap();
+//     console.log('Joined channel names:', channelMap);
 
-    //  const messages = await getRecentMessages();
-    const results: Record<string, string[]> = {};
-    // const channelIds = ["C093GASKAKF","C093KD45H3N"]; // You can add more channel IDs if needed
-    const channelMap = await getJoinedChannelMap();
-    console.log('Joined channel names:', channelMap);
+//     for (const [channelId, channelName] of Object.entries(channelMap)) {
+//       const messages = await fetchSlackMessages("slackToken", channelId, 100);
+//       console.log('Messages list:', messages);
 
-    for (const [channelId, channelName] of Object.entries(channelMap)) {
-      const messages = await fetchSlackMessages("slackToken", channelId, 100);
-      console.log('Messages list:', messages);
+//       const key = `${channelName}(${channelId})`;
+//       results[key] = messages;
+//     }
+//     // return {
+//     //       content: [
+//     //         {
+//     //           type: "json",
+//     //           json: results,
+//     //         },
+//     //       ],
+//     //     };
 
-      const key = `${channelName}(${channelId})`;
-      results[key] = messages;
-    }
-    // return {
-    //       content: [
-    //         {
-    //           type: "json",
-    //           json: results,
-    //         },
-    //       ],
-    //     };
+//     return ({
+//       content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
+//     });
+//   }
+// );
 
-    return ({
-      content: [{ type: "text", text: "Reading Slack conversations..." + JSON.stringify(results, null, 2) }]
-    });
-  }
-);
+
 async function getJoinedChannelMap(): Promise<Record<string, string>> {
   try {
     const result = await app.client.conversations.list({
@@ -200,6 +201,23 @@ async function getChannelName(channelId: string): Promise<string | null> {
     return null;
   }
 }
+
+
+
+server.registerTool("read-slack-conversations",
+  {
+    title: "Slack Reader",
+    description: "Read Slack Converstaions History"
+  },
+  async (_input, context) => {
+   
+      const slackReader = new SlackReader();
+      const results = await slackReader.getMessages();
+      return ({
+      content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
+    });
+  }
+);
 
 server.registerResource(
   "get-channel-name",
