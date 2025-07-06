@@ -18,7 +18,7 @@
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "my-openai-agent": "file:../my-openai-agent/my-openai-agent-1.0.0.tgz",
-    "tt-ai-agent": "file:../tt-ai-agent/tt-ai-agent-1.0.0.tgz"
+    "tt-ai-agent": "^1.0.0"
   },
   "devDependencies": {
     "@types/axios": "^0.14.4",
