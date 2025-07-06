@@ -6,20 +6,20 @@ import OpenAIClient from "./openai-client.js";
 export default class MyAgent {
     private mcpClients: MCPClient[];
     private openAIClient: OpenAIClient | null = null; // Replace with actual type
-    private context: string;
     private model: string;
-    private systemPrompt: string;
+    private apiKey: string;
+    private apiBaseURL: string;
 
     constructor(
         mcpClients: MCPClient[] = [],
-        context: string = "default",
+        apiKey: string,
+        apiBaseURL: string,
         model: string,
-        systemPrompt: string
     ) {
         this.mcpClients = mcpClients;
-        this.context = context;
         this.model = model;
-        this.systemPrompt = systemPrompt;
+        this.apiKey = apiKey;
+        this.apiBaseURL = apiBaseURL;
     }
 
     public async init() {
@@ -33,7 +33,7 @@ export default class MyAgent {
         const tools = this.mcpClients.flatMap(client => client.getTools());
         logInfo(`Collected ${tools.length} tools from MCP clients.`);
         // Initialize OpenAI client with the provided model, system prompt, tools, and context
-        this.openAIClient = new OpenAIClient(this.model, this.systemPrompt, tools, this.context);
+        this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools);
 
     }
 

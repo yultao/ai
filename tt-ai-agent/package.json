@@ -12,11 +12,7 @@
     "tt-ai-agent-cli": "dist/cli.js"
   },
   "exports": {
-    ".": "./dist/main.js",
-    "./McpServerConfig": "./dist/mcp-server-config.js",
-    "./McpClient": "./dist/mcp-client.js",
-    "./Logger": "./dist/logger.js",
-    "./MyAgent": "./dist/agent.js"
+    "./Bot": "./dist/bot.js"
   },
   "files": ["dist"],
   "keywords": [],

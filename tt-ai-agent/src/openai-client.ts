@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import dotenv from 'dotenv';
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import {logInfo,logTitle} from "./logger.js";
 
@@ -17,13 +16,12 @@ export default class OpenAIClient {
     // Array to hold chat messages
     private messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 
-    constructor(model: string, systemPrompt: string, tools: Tool[] = [], context: string = 'default') {
-        dotenv.config();
-        this.openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-            baseURL: process.env.OPENAI_API_BASE,
-        });
+    constructor(apiKey: string, apiBaseURL: string, model: string, tools: Tool[] = []) {
 
+        this.openai = new OpenAI({
+            apiKey: apiKey,
+            baseURL: apiBaseURL,
+        });
         this.model = model;
         this.tools = tools;
     }

@@ -1,5 +1,5 @@
 import MCPClient from './mcp-client.js';
-import MyAgent from './agent.js';
+import MyAgent from './ai-agent.js';
 import {logInfo,logTitle} from "./logger.js";
 
 
