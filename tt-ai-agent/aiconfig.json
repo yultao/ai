@@ -53,10 +53,10 @@
       ]
     },
     "slack-mcp": {
-      "disabled": false,
+      "disabled": true,
       "command": "node",
       "args": [
-        "C:/Workspace/ai/slack-mcp-server/build/index.js"
+        "C:/Workspace/ai/slack-mcp-server/dist/index.js"
       ]
     },
     "file": {

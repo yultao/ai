@@ -2,7 +2,7 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import Slack from '@slack/bolt';
-import { SlackReader } from "./slack/slack-reader.js";
+import { SlackReader } from "./slack-reader.js
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 

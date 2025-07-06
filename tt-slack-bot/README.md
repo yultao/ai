@@ -1,3 +1,23 @@
+
+1. Listen to Slack
+2. Send msg to tt-ai-agent
+3. Reply Slack
+
+1. 安装运行时依赖：
+npm install axios dotenv node express 
+npm install @slack/bolt
+npm install dotenv
+
+2. 安装开发依赖：
+npm install --save-dev typescript ts-node nodemon @types/node @types/express @types/axios
+
+3. 初始化 TypeScript 配置
+npx tsc --init
+
+ngrok http http://localhost:3000
+
+
+
 ### js vs mjs
 .js 是普通的 JavaScript 文件，默认用 CommonJS 模块系统（require、module.exports）
 

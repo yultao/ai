@@ -26,92 +26,20 @@ export default class OpenAIClient {
         this.tools = tools;
     }
 
-    async chat2(promt?:string) {
-        logTitle("CHAT");
-        if (promt) {
-            this.messages.push({ role: 'user', content: promt });
+    private appendMessages(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
+        this.messages.push(message);           // Add to end
+        if (this.messages.length > 1000) {
+            this.messages.shift();            // Remove from front if over limit
         }
-
-        const stream = await this.openai.chat.completions.create({
-            model: this.model,
-            messages: this.messages,
-            stream: true,
-            tools: this.getOpenAITools(),
-            
-        });
-
-        let content = '';
-        let toolCalls: ToolCall[] = [];
-
-        logTitle("RESPONSE");
-
-        for await (const part of stream) {
-            // logInfo(`Part: ${JSON.stringify(part)}`);
-            if (part.choices[0].delta.content) {
-                content += part.choices[0].delta.content;
-                process.stdout.write(part.choices[0].delta.content);
-            }
-
-
-            if (part.choices[0].delta.tool_calls) {
-                console.log(3);
-                for (const toolCall of part.choices[0].delta.tool_calls) {
-                    console.log(4 + ": " +JSON.stringify(toolCall));
-                    // Ensure toolCalls has enough space for the current index
-                    if(toolCalls.length < toolCall.index) {//0, index:1
-                        console.log(5);
-                        toolCalls.push({
-                            id: '',
-                            function: {
-                                name: '',
-                                arguments: '',
-                            },
-                        }); 
-                    }
-                    console.log("toolCall: ", JSON.stringify(toolCall));
-                    console.log("toolCalls: ", JSON.stringify(toolCalls), "length: ", toolCalls.length);
-                    // Update the tool call at the current index
-                    let currentToolCall = toolCalls[toolCall.index-1];
-                    console.log(`currentToolCall: ${JSON.stringify(currentToolCall)}`);
-                    if( toolCall.id) {
-                        currentToolCall.id += toolCall.id;
-                    }
-                    if (toolCall.function) {
-                        if (toolCall.function.name) {
-                            currentToolCall.function.name += toolCall.function.name;
-                        }
-                        if (toolCall.function.arguments) {
-                            currentToolCall.function.arguments += toolCall.function.arguments;
-                        }
-                    }
-
-                    logInfo(`Current tool call: ${JSON.stringify(currentToolCall)}`);
-                }// end for each tool call
-            }
-        }
-        process.stdout.write("\nEND\n");
-        // push the final message to the messages array
-        this.messages.push({ 
-            role: 'assistant', 
-            content,
-            tool_calls: toolCalls.map(toolCall => ({
-                type: 'function',
-                id: toolCall.id,
-                function: {
-                    name: toolCall.function.name,
-                    arguments: toolCall.function.arguments,
-                },
-            })),
-         });
-        // Filter out any undefined tool calls
-        return {content, toolCalls};
     }
+    
 
     async chat(promt?:string) {
+        logInfo(`this.message.length: ${this.messages.length}`);
         logTitle("REQUEST");
         if (promt) {
             logInfo(promt);
-            this.messages.push({ role: 'user', content: promt });
+            this.appendMessages({ role: 'user', content: promt });
         }
 
         const stream = await this.openai.chat.completions.create({
@@ -123,7 +51,6 @@ export default class OpenAIClient {
         });
 
         let content = '';
-        
         const toolCallsMap = new Map<string, ToolCall>();
 
         logTitle("RESPONSE");
@@ -177,7 +104,7 @@ export default class OpenAIClient {
         logTitle("END");
         let toolCalls: ToolCall[] = Array.from(toolCallsMap.values());
         // push the final message to the messages array
-        this.messages.push({ 
+        this.appendMessages({ 
             role: 'assistant', 
             content,
             tool_calls: toolCalls.map(toolCall => ({
@@ -207,7 +134,7 @@ export default class OpenAIClient {
     }
 
     public appendToolResult(toolCallId: string, toolOutput: string): void {
-        this.messages.push({
+        this.appendMessages({
             role: 'tool',
             content: toolOutput,
             tool_call_id: toolCallId,

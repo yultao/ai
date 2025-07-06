@@ -8,11 +8,14 @@ import { createInterface } from "readline/promises";
 import dotenv from 'dotenv';
 export default class QnA {
     private aiConfigPath: string;
+   
+
     constructor(aiConfigPath: string = "aiconfig.json") {
         this.aiConfigPath = aiConfigPath;
+        
     }
 
-    private async getAgent() {
+    private async createAgent() {
         logInfo("Starting my-agent...");
         // Parse command line arguments
         const args = process.argv.slice(2);
@@ -54,7 +57,7 @@ export default class QnA {
             input: process.stdin,
             output: process.stdout
         });
-        const myAgent = await this.getAgent();
+        const myAgent = await this.createAgent();
         try {
             
             while (true) {
@@ -73,7 +76,7 @@ export default class QnA {
     }
 
     public async ask(question: string) {
-        const myAgent = await this.getAgent();
+        const myAgent = await this.createAgent();
         let response
         try {
             response = await myAgent.invoke(question);
@@ -84,5 +87,24 @@ export default class QnA {
             await myAgent.close();
         }
         return response;
+    }
+
+
+    private longAgent?: MyAgent = undefined;
+    public async startConversation() {
+        this.longAgent = await this.createAgent();
+    }
+    public async tell(question: string) {
+        let response
+        try {
+            response = await this.longAgent!.invoke(question);
+            logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
+        } catch (error) {
+            logError(`Error invoking agent: ${error}`);
+        }
+        return response;
+    }
+    public async stopConversation() {
+        await this.longAgent!.close();
     }
 }
