@@ -3,19 +3,21 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import Slack from '@slack/bolt';
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
+const token = "xoxp-9121446094692-9121446119588-9126918171239-e027b8873aad5f91303bf2878c2bbadc";
+const signingSecret = "c2c5eec8d39db9f1823596e20aaa1ccd";
 const token2 = process.env.SLACK_USER_TOKEN;
 const signingSecret2 = process.env.SLACK_USER_SIGNING_SECRET;
 console.log("Slack user token:", token2);
 console.log("Slack user signing secret:", signingSecret2);
 const app = new Slack.App({
-    token: token2,
-    signingSecret: signingSecret2
+    token: token,
+    signingSecret: signingSecret
 });
 console.log("Slack read app initialized with signing secret and bot token");
 console.log('Channel ID:', process.env.SLACK_USER_CHANNEL_ID);
 // 10 hours ago in Unix timestamp
 const now = Math.floor(Date.now() / 1000);
-const sometimeAgo = (now - 24 * 60 * 60).toString();
+const sometimeAgo = (now - 2400 * 60 * 60).toString();
 async function fetchSlackMessages2(token, channelId, limit = 100, names) {
     try {
         let userIds = new Set();

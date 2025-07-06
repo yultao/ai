@@ -6,12 +6,12 @@
       "args": ["https://leetcode.com/problemset/algorithms/"]
     },
     "slack-mcp": {
-      "disabled": true,
+      "disabled": false,
       "command": "node",
       "args": ["C:/Workspace/ai/slack-mcp-server/build/index.js"]
     },
     "file": {
-      "disabled": false,
+      "disabled": true,
       "command": "npx",
       "args": ["-y",
          "@modelcontextprotocol/server-filesystem",

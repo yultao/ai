@@ -152,3 +152,4 @@ my-mcp/build/model/openai.d.ts
 my-mcp/build/model/openai.js
 my-mcp/build/types/index.d.ts
 my-mcp/build/types/index.js
+slack-mcp-server/build/index.js

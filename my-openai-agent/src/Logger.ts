@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-export default function logInfo(message: string): void {
+export  function logInfo(message: string): void {
     const totalLength = 80;
     const messageLength = message.length;
     const paddingLength = totalLength - messageLength - 10; // 10 for "[INFO] " prefix
@@ -10,3 +10,11 @@ export default function logInfo(message: string): void {
     console.log(chalk.blue(`${paddedMessage}`));
 }
 
+export function logTitle(message: string): void {
+    const totalLength = 80;
+    const messageLength = message.length;
+    const padding = Math.max(totalLength- messageLength - 4, 0); // Ensure non-negative padding length
+    const paddedMessage = `${'='.repeat(Math.floor(padding/2))} ${message} ${'='.repeat(Math.ceil(padding/2))}`;
+
+    console.log(chalk.bold.cyanBright(`${paddedMessage}`));
+}

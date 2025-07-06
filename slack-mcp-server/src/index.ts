@@ -5,6 +5,7 @@ import Slack from '@slack/bolt';
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 
+
 const token2: string = process.env.SLACK_USER_TOKEN as string;
 const signingSecret2: string = process.env.SLACK_USER_SIGNING_SECRET as string
 console.log("Slack user token:", token2);
@@ -20,7 +21,7 @@ console.log("Slack read app initialized with signing secret and bot token");
 console.log('Channel ID:', process.env.SLACK_USER_CHANNEL_ID);
 // 10 hours ago in Unix timestamp
 const now = Math.floor(Date.now() / 1000);
-const sometimeAgo: string = (now - 24 * 60 * 60).toString();
+const sometimeAgo: string = (now - 2400 * 60 * 60).toString();
 
 
 async function fetchSlackMessages2(
