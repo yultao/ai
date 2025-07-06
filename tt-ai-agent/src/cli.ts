@@ -1,18 +1,19 @@
-import MCPClient from './McpClient.js';
-import MyAgent from './MyAgent.js';
-import {logInfo,logTitle} from "./Logger.js";
-import { getMcpServerConfigs } from './McpServerConfig.js';
+#!/usr/bin/env node
+import MCPClient from './mcp-client.js';
+import MyAgent from './agent.js';
+import {logInfo,logTitle} from "./logger.js";
+import { getMcpServerConfigs } from './mcp-server-config.js';
 import { createInterface } from "readline/promises";
 
 async function main() {
     logInfo("Starting my-agent...");
 
     const args = process.argv.slice(2);
-console.log(args);
+    console.log(args);
 
 
     // Example usage
-    const servers = getMcpServerConfigs("C:\\Workspace\\ai\\my-openai-agent");
+    const servers = getMcpServerConfigs();
     const activeServers = servers.filter(server => !server.disabled);
     console.log(activeServers);
 

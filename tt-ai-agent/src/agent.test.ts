@@ -1,6 +1,6 @@
-import MCPClient from './McpClient.js';
-import MyAgent from './MyAgent.js';
-import {logInfo,logTitle} from "./Logger.js";
+import MCPClient from './mcp-client.js';
+import MyAgent from './agent.js';
+import {logInfo,logTitle} from "./logger.js";
 
 
 async function main() {

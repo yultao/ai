@@ -1,5 +1,5 @@
 
-import MCPClient from './McpClient.js';
+import MCPClient from './mcp-client.js';
 
 async function main() {
     console.log("Starting my-agent...");

@@ -20,8 +20,9 @@ interface ServerEntry {
   disabled: boolean;
 }
 
-export function getMcpServerConfigs(dir:string): ServerEntry[] {
-  const configPath = path.join(dir, "mcpconfig.json");
+export function getMcpServerConfigs(): ServerEntry[] {
+  const configPath = path.join("mcpconfig.json");
+  console.log("Reading MCP server config from:", configPath);
   const rawData = fs.readFileSync(configPath, "utf-8");
   const config: Config = JSON.parse(rawData);
 

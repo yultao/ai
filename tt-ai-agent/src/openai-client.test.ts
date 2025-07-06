@@ -1,4 +1,4 @@
-import OpenAIClient from './OpenAIClient.js';
+import OpenAIClient from './openai-client.js';
 async function main() {
     console.log("Starting my-agent...");
 

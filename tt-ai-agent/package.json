@@ -1,13 +1,24 @@
 {
-  "name": "my-agent",
+  "name": "tt-ai-agent",
   "version": "1.0.0",
-  "description": "0. 初始化\r npm init -y",
+  "description": "A TypeScript-based OpenAI headless agent for Model Context Protocol",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "tt-ai-agent-cli": "dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/main.js",
+    "./McpServerConfig": "./dist/mcp-server-config.js",
+    "./McpClient": "./dist/mcp-client.js",
+    "./Logger": "./dist/logger.js",
+    "./MyAgent": "./dist/agent.js"
+  },
+  "files": ["dist"],
   "keywords": [],
   "author": "",
   "license": "ISC",

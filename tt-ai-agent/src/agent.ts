@@ -1,6 +1,6 @@
-import {logInfo,logTitle} from "./Logger.js";
-import MCPClient from "./McpClient.js";
-import OpenAIClient from "./OpenAIClient.js";
+import {logInfo,logTitle} from "./logger.js";
+import MCPClient from "./mcp-client.js";
+import OpenAIClient from "./openai-client.js";
 
 
 export default class MyAgent {
