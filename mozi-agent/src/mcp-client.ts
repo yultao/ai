@@ -37,7 +37,7 @@ export default class MCPClient {
                 };
             });
             console.log(
-                "Connected to server with tools:",
+                "Connected to "+this.name+" server with tools:",
                 this.tools.map(({ name }) => name)
             );
         } catch (e) {

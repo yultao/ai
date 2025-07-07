@@ -53,7 +53,7 @@ export default class MyAgent {
             if (response.toolCalls.length > 0) {
                 // 如果有工具调用，处理每个工具调用
                 for (const toolCall of response.toolCalls) {
-                    logInfo(`Tool call returned by LLM: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
+                    //logInfo(`Tool call returned by LLM: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
 
                     // Find the MCP client that has the tool
                     const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === toolCall.function.name));

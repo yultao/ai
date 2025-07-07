@@ -31,6 +31,7 @@ export default class VectorStore {
         const dotProduct = v1.reduce((acc, val, idx) => acc + val * v2[idx], 0);
         const magnitude1 = Math.sqrt(v1.reduce((acc, val)=>acc+val*val, 0));
         const magnitude2 = Math.sqrt(v2.reduce((acc, val)=>acc+val*val, 0));
+
         return dotProduct/(magnitude1 * magnitude2);
     }
 }

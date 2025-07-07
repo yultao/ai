@@ -65,11 +65,12 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:\\Workspace\\ai\\tt-slack-bot"
+        "C:\\Workspace\\ai\\mozi-agent"
       ]
     }
   },
   "embedding": {
+      "model": "Xenova/distiluse-base-multilingual-cased-v1",
       "embeddingKey": "sk-this-will-be-replaced-by-env",
       "embeddingBaseURL": "https://openrouter.ai/api/v1"
   }

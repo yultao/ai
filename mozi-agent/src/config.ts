@@ -13,6 +13,7 @@ interface ApiProviderConfig {
 }
 
 interface EmbeddingConfig {
+  model: string;
   apiKey: string;
   apiBaseURL: string;
 }
