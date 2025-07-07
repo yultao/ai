@@ -9,17 +9,22 @@ export default class MyAgent {
     private model: string;
     private apiKey: string;
     private apiBaseURL: string;
-
+    private systemPrompt: string;
+    private context: string;
     constructor(
         mcpClients: MCPClient[] = [],
         apiKey: string,
         apiBaseURL: string,
         model: string,
+        systemPrompt: string,
+        context: string
     ) {
         this.mcpClients = mcpClients;
         this.model = model;
         this.apiKey = apiKey;
         this.apiBaseURL = apiBaseURL;
+        this.systemPrompt = systemPrompt;
+        this.context = context;
     }
 
     public async init() {
@@ -33,7 +38,7 @@ export default class MyAgent {
         const tools = this.mcpClients.flatMap(client => client.getTools());
         logInfo(`Collected ${tools.length} tools from MCP clients.`);
         // Initialize OpenAI client with the provided model, system prompt, tools, and context
-        this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools);
+        this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
 
     }
 
@@ -71,7 +76,7 @@ export default class MyAgent {
                 response = await this.openAIClient.chat();
                 continue; // Continue to process the next response
             }
-            logInfo(`Tool call done`);
+            
             //如果没有工具调用，返回内容
             return response.content;
         }

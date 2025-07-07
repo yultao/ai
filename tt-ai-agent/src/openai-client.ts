@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import {logInfo,logTitle} from "./logger.js";
+import {logInfo,logTitle, logGreenInfo} from "./logger.js";
 
 export interface ToolCall {
     id: string;
@@ -16,7 +16,7 @@ export default class OpenAIClient {
     // Array to hold chat messages
     private messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 
-    constructor(apiKey: string, apiBaseURL: string, model: string, tools: Tool[] = []) {
+    constructor(apiKey: string, apiBaseURL: string, model: string, tools: Tool[] = [], systemPrompt: string="", context: string = '') {
 
         this.openai = new OpenAI({
             apiKey: apiKey,
@@ -24,11 +24,13 @@ export default class OpenAIClient {
         });
         this.model = model;
         this.tools = tools;
+        if(systemPrompt) this.appendMessages({ role: 'system', content: systemPrompt });
+        if(context) this.appendMessages({ role: 'user', content: context });
     }
 
     private appendMessages(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
         this.messages.push(message);           // Add to end
-        if (this.messages.length > 1000) {
+        if (this.messages.length > 100000) {
             this.messages.shift();            // Remove from front if over limit
         }
     }
@@ -38,7 +40,7 @@ export default class OpenAIClient {
         logInfo(`this.message.length: ${this.messages.length}`);
         logTitle("REQUEST");
         if (promt) {
-            logInfo(promt);
+            logGreenInfo(promt);
             this.appendMessages({ role: 'user', content: promt });
         }
 

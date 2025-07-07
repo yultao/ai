@@ -2,11 +2,11 @@
 import MCPClient from './mcp-client.js';
 import MyAgent from './ai-agent.js';
 import { logInfo, logTitle, logError } from "./logger.js";
-import AiConfig  from './ai-config.js';
+import AiConfig  from './config.js';
 import { createInterface } from "readline/promises";
 
 import dotenv from 'dotenv';
-export default class QnA {
+export default class Bot {
     private aiConfigPath: string;
    
 
@@ -15,7 +15,7 @@ export default class QnA {
         
     }
 
-    private async createAgent() {
+    private async createAgent(context: string="") {
         logInfo("Starting my-agent...");
         // Parse command line arguments
         const args = process.argv.slice(2);
@@ -38,26 +38,34 @@ export default class QnA {
         const model = args[0] || aiConfig.getModelConfig();
         logInfo(`Using model: ${model}`);
 
+        const embeddingConfig = aiConfig.getEmbeddingConfig();
+        logInfo(`Using Embedding Key: ${embeddingConfig.embeddingKey}`);
+        logInfo(`Using Embedding Base URL: ${embeddingConfig.embeddingBaseURL}`);
 
+        logInfo(`Using model: ${model}`);
         const mcpClients = activeServers
             .map(server => {
                 const clientName = `${server.name}-client`;
                 return new MCPClient(clientName, server.command, server.args);
             });
 
-        const myAgent = new MyAgent(mcpClients, apiKey, apiBaseURL, model);
+        const systemPrompt = "You are an AI assitant";
+        const myAgent = new MyAgent(mcpClients, apiKey, apiBaseURL, model, systemPrompt, context);
 
 
         await myAgent.init();
         return myAgent;
     }
     
-    public async chat() {
+    /**
+     * scenario 1: self-loop conversation
+     */
+    public async autoConversation(context: string = "") {
         const rl = createInterface({
             input: process.stdin,
             output: process.stdout
         });
-        const myAgent = await this.createAgent();
+        const myAgent = await this.createAgent(context);
         try {
             
             while (true) {
@@ -75,8 +83,11 @@ export default class QnA {
         }
     }
 
-    public async ask(question: string) {
-        const myAgent = await this.createAgent();
+    /*
+    scenario 2: single question
+    */
+    public async askSingleQuestion(question: string, context: string = "") {
+        const myAgent = await this.createAgent(context);
         let response
         try {
             response = await myAgent.invoke(question);
@@ -90,11 +101,14 @@ export default class QnA {
     }
 
 
+    /**
+     * scnario 3: chat from time to time
+     */
     private longAgent?: MyAgent = undefined;
-    public async startConversation() {
-        this.longAgent = await this.createAgent();
+    public async startChat(context: string = "") {
+        this.longAgent = await this.createAgent(context);
     }
-    public async tell(question: string) {
+    public async chat(question: string) {
         let response
         try {
             response = await this.longAgent!.invoke(question);
@@ -104,7 +118,7 @@ export default class QnA {
         }
         return response;
     }
-    public async stopConversation() {
+    public async stopChat() {
         await this.longAgent!.close();
     }
 }

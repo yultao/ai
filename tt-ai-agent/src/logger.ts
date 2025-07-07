@@ -8,6 +8,9 @@ function getMessage(prefix: string, message: string): string {
     const paddedMessage = `[${prefix}] ${message}${padding}`;
     return paddedMessage;
 }
+export  function logGreenInfo(message: string): void {
+    console.log(chalk.green(`${getMessage("INFO", message)}`));
+}
 
 export  function logInfo(message: string): void {
     console.log(chalk.blue(`${getMessage("INFO", message)}`));

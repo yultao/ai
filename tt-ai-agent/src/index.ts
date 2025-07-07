@@ -1,4 +1,4 @@
-import Bot from '../src/bot.js';
+import Bot from './bot.js';
 
 async function askSingleQuestion() {
     const bot = new Bot();
@@ -9,11 +9,16 @@ async function askSingleQuestion() {
 async function autoConversation() {
     const bot = new Bot();
     const res = await bot.autoConversation();
-    console.log(res);
     return res;
 }
-
-autoConversation();
+async function manualConversation() {
+    const bot = new Bot();
+    await bot.startChat();
+    await bot.chat("I am in Shanghai");
+    await bot.chat("Where am I");
+    await bot.stopChat();
+}
+manualConversation();
 
 // test('ask and answer', () => {
 //     expect(tt()).toBe(3);

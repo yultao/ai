@@ -12,12 +12,18 @@ interface ApiProviderConfig {
   apiBaseURL: string;
 }
 
+interface EmbeddingConfig {
+  embeddingKey: string;
+  embeddingBaseURL: string;
+}
+
 interface Config {
   model: string;
   mcpServers: {
     [name: string]: McpServerConfig;
   };
   apiProvider: ApiProviderConfig;
+  embedding: EmbeddingConfig;
 }
 
 interface ServerEntry {
@@ -26,10 +32,10 @@ interface ServerEntry {
   args: string[];
   disabled: boolean;
 }
-interface ApiProviderEntry {
-  apiKey: string;
-  apiBaseURL: string;
-}
+// interface ApiProviderEntry {
+//   apiKey: string;
+//   apiBaseURL: string;
+// }
 
 
 export default class AiConfig {
@@ -59,13 +65,19 @@ export default class AiConfig {
     return config.model;
   }
 
-  getApiProviderConfig(): ApiProviderEntry {
+  getEmbeddingConfig(): EmbeddingConfig {
     const config = this.readConfig();
-    const apiProviderConfig = config.apiProvider;
-    return {
-      apiKey: apiProviderConfig.apiKey,
-      apiBaseURL: apiProviderConfig.apiBaseURL,
-    };
+    return config.embedding;
+  }
+
+  getApiProviderConfig(): ApiProviderConfig {
+    const config = this.readConfig();
+    return config.apiProvider;
+    // const apiProviderConfig = config.apiProvider;
+    // return {
+    //   apiKey: apiProviderConfig.apiKey,
+    //   apiBaseURL: apiProviderConfig.apiBaseURL,
+    // };
   }
   getMcpServerConfigs(): ServerEntry[] {
     const config = this.readConfig();

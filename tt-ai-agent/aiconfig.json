@@ -68,5 +68,9 @@
         "C:\\Workspace\\ai\\my-openai-agent\\dist"
       ]
     }
+  },
+  "embedding": {
+      "embeddingKey": "sk-this-will-be-replaced-by-env",
+      "embeddingBaseURL": "https://openrouter.ai/api/v1"
   }
 }

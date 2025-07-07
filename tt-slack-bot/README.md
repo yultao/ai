@@ -1,7 +1,15 @@
-
+Scenario 1: 
 1. Listen to Slack
 2. Send msg to tt-ai-agent
 3. Reply Slack
+4. keep 1000 recent messages
+
+Scenario 2: RAG
+1. Read converstions history, and create embedded knowledge
+2. Accept prompt, and create embedded prompt
+3. Find relevant knowledge according to embedded prompt
+4. Send relevant knowledge to LLM as message history
+5. Send prompot to LLM
 
 1. 安装运行时依赖：
 npm install axios dotenv node express 
