@@ -32,15 +32,13 @@ export default class Bot {
 
         const apiKey = process.env.OPENAI_API_KEY || apiProviderConfig.apiKey;
         const apiBaseURL = apiProviderConfig.apiBaseURL;;
-        logInfo(`Using API Key: ${apiKey}`);
-        logInfo(`Using API Base URL: ${apiBaseURL}`);
+        logInfo(`Using Provider API Key: ${apiKey}`);
+        logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
 
         const model = args[0] || aiConfig.getModelConfig();
         logInfo(`Using model: ${model}`);
 
-        const embeddingConfig = aiConfig.getEmbeddingConfig();
-        logInfo(`Using Embedding Key: ${embeddingConfig.embeddingKey}`);
-        logInfo(`Using Embedding Base URL: ${embeddingConfig.embeddingBaseURL}`);
+     
 
         logInfo(`Using model: ${model}`);
         const mcpClients = activeServers
@@ -91,7 +89,7 @@ export default class Bot {
         let response
         try {
             response = await myAgent.invoke(question);
-            logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
+            // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
         } catch (error) {
             logError(`Error invoking agent: ${error}`);
         } finally {
@@ -112,7 +110,7 @@ export default class Bot {
         let response
         try {
             response = await this.longAgent!.invoke(question);
-            logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
+            // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
         } catch (error) {
             logError(`Error invoking agent: ${error}`);
         }

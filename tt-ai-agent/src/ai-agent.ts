@@ -62,7 +62,7 @@ export default class MyAgent {
                         logInfo(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
                         
                         const result = await mcpClient.callTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
-                        logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
+                        // logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
                        
                         this.openAIClient.appendToolResult(toolCall.id, JSON.stringify(result));
                         

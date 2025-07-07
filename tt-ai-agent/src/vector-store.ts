@@ -1,3 +1,5 @@
+import { logInfo } from "./logger.js";
+
 export interface VectorStoreItem {
     embedding: number[],
     document: string
@@ -17,8 +19,12 @@ export default class VectorStore {
             document: item.document,
             score: this.consineSim(item.embedding, queryEmbedding)
         }));
+
         
-        return scored.sort((a, b) => b.score - a.score).slice(0, topk);
+        const top = scored.sort((a, b) => b.score - a.score).slice(0, topk);
+
+        logInfo(`Found ${scored.length} similar records from ${this.vectorStore.length} records. Will return top 3 ${JSON.stringify(top.map(t=>t.score))} after sorting by score descending`)
+        return top;
     }
 
     private consineSim(v1: number[], v2: number[]) {

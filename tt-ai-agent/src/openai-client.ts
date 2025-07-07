@@ -68,7 +68,7 @@ export default class OpenAIClient {
             if (part.choices[0].delta.tool_calls) {
                 // console.log(3);
                 for (const toolCall of part.choices[0].delta.tool_calls) {
-                    logInfo(`toolCall: ${JSON.stringify(toolCall)}`);
+                    // logInfo(`toolCall: ${JSON.stringify(toolCall)}`);
                     
                     const key = toolCall.index.toString();
                     // console.log(5 + " key: " +key+": "+(!toolCallsMap.has(key)));
@@ -97,8 +97,8 @@ export default class OpenAIClient {
                             currentToolCall!.function.arguments += toolCall.function.arguments;
                         }
                     }
-                    logInfo(`currentToolCall: ${JSON.stringify(currentToolCall)}`);
-                    logInfo(`toolCallsMap: ${[...toolCallsMap.entries()]}`);
+                    // logInfo(`currentToolCall: ${JSON.stringify(currentToolCall)}`);
+                    // logInfo(`toolCallsMap: ${[...toolCallsMap.entries()]}`);
                 }// end for each tool call
             }
         }
