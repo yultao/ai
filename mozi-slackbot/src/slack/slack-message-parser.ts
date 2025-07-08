@@ -12,6 +12,7 @@ export default class SlackConversationParser {
   constructor(channelRoot: string, outputDir: string) {
     this.rootPath = path.resolve(channelRoot);
     this.outputPath = path.resolve(outputDir);
+
     if (!fs.existsSync(this.outputPath)) {
       fs.mkdirSync(this.outputPath, { recursive: true });
     }
@@ -43,13 +44,14 @@ export default class SlackConversationParser {
         try {
           const raw = fs.readFileSync(filePath, 'utf-8');
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed.messages)) {
-            const cleaned = parsed.messages.map((msg: SlackMessage) => {
-              const { blocks, ...rest } = msg;
-              return rest;
-            });
-            allMessages.push(...cleaned);
-          }
+
+          const messages = this.extractMessages(parsed);
+          const cleaned = messages.map((msg: SlackMessage) => {
+            const { blocks, ...rest } = msg;
+            return rest;
+          });
+
+          allMessages.push(...cleaned);
         } catch (err) {
           console.warn(`Failed to parse ${filePath}: ${err}`);
         }
@@ -57,5 +59,17 @@ export default class SlackConversationParser {
     }
 
     return allMessages;
+  }
+
+  private extractMessages(json: any): SlackMessage[] {
+    if (Array.isArray(json.messages)) {
+      return json.messages;
+    }
+
+    if (json.history && Array.isArray(json.history.messages)) {
+      return json.history.messages;
+    }
+
+    return []; // fallback if neither exists
   }
 }
