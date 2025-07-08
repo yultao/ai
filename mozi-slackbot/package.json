@@ -18,7 +18,8 @@
     "axios": "^1.10.0",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
-    "mozi-agent": "^0.0.1"
+    "mozi-agent": "^0.0.1",
+    "puppeteer": "^24.12.0"
   },
   "devDependencies": {
     "@types/axios": "^0.14.4",

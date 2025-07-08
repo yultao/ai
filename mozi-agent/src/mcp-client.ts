@@ -2,6 +2,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { Tool } from "@modelcontextprotocol/sdk/types";
+import { logError } from "./logger.js";
 
 
 export default class MCPClient {
@@ -37,7 +38,7 @@ export default class MCPClient {
                 };
             });
             console.log(
-                "Connected to "+this.name+" server with tools:",
+                "Connected "+this.name+" to server with tools:",
                 this.tools.map(({ name }) => name)
             );
         } catch (e) {
@@ -59,7 +60,13 @@ export default class MCPClient {
         return this.tools;
     }
     public async callTool(toolName: string, args: Record<string, any>) {
-        return this.mcp.callTool({name: toolName, arguments: args});
+        try {
+            return this.mcp.callTool({name: toolName, arguments: args});
+        } catch (e) {
+            logError("Failed to call tool "+toolName);
+            return "";
+        } 
+        
     }
 
     public getName() {

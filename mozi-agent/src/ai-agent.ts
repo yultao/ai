@@ -1,4 +1,4 @@
-import {logInfo,logTitle} from "./logger.js";
+import { logError, logInfo, logTitle } from "./logger.js";
 import MCPClient from "./mcp-client.js";
 import OpenAIClient from "./openai-client.js";
 
@@ -28,7 +28,7 @@ export default class MyAgent {
     }
 
     public async init() {
-        logInfo("Initializing MyAgent with model: " + this.model );
+        logInfo("Initializing MyAgent with model: " + this.model);
         // Initialize MCP clients
         for (const client of this.mcpClients) {
             await client.init();
@@ -42,14 +42,17 @@ export default class MyAgent {
 
     }
 
-    public async invoke (prompt: string) {
-        if(!this.openAIClient) {
+    public async invoke(prompt: string) {
+        if (!this.openAIClient) {
             throw new Error("OpenAI client is not initialized.");
         }
-       
-        // Invoke the OpenAI client with the provided prompt
-        let response = await this.openAIClient.chat(prompt);
+
+
+        console.log("before");
+        let response = await this.openAIClient!.chat(prompt);
+        console.log("after response " + JSON.stringify(response));
         while (true) {
+
             if (response.toolCalls.length > 0) {
                 // 如果有工具调用，处理每个工具调用
                 for (const toolCall of response.toolCalls) {
@@ -60,12 +63,12 @@ export default class MyAgent {
                     if (mcpClient) {
                         // Call the tool using the MCP client
                         logInfo(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
-                        
+
                         const result = await mcpClient.callTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
                         // logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
-                       
+
                         this.openAIClient.appendToolResult(toolCall.id, JSON.stringify(result));
-                        
+
                     } else {
                         logInfo(`No MCP client found for tool ${toolCall.function.name}.`);
                         this.openAIClient.appendToolResult(toolCall.id, "No MCP client found for this tool.");
@@ -76,13 +79,12 @@ export default class MyAgent {
                 response = await this.openAIClient.chat();
                 continue; // Continue to process the next response
             }
-            
             //如果没有工具调用，返回内容
             return response.content;
         }
     }
 
-    
+
 
     public async close() {
         // Close all MCP clients

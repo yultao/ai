@@ -1,7 +1,7 @@
 {
   "apiProvider": {
     "apiKey": "sk-this-will-be-replaced-by-env",
-    "apiBaseURL": "https://openrouter.ai/api/v1"
+    "apiBaseURL": "https://api.groq.com/openai/v1"
   },
   "apiProviders": {
     "openrouter": {
@@ -13,7 +13,7 @@
       "apiBaseURL": "https://api.groq.com/openai/v1"
     }
   },
-  "model": "deepseek/deepseek-chat-v3-0324:free",
+  "model": "meta-llama/llama-4-scout-17b-16e-instruct",
   "models": {
     "deepseek/deepseek-chat-v3-0324:free": {
       "name": "DeepSeek Chat V3",

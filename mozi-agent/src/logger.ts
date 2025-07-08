@@ -19,7 +19,9 @@ export  function logInfo(message: string): void {
 export  function logError(message: string): void {
     console.log(chalk.red(`${getMessage("ERRR", message)}`));
 }
-
+export  function logWarn(message: string): void {
+    console.log(chalk.grey(`${getMessage("WARN", message)}`));
+}
 
 export function logTitle(message: string): void {
     const totalLength = 80;
