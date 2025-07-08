@@ -1,0 +1,1223 @@
+{
+    "ok": true,
+    "history": {
+        "messages": [
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751843923.675659",
+                "client_msg_id": "dd9fcdf2-c12a-4a43-9807-de0b2db766ad",
+                "text": "hi <@U093KDK0PPW> who am I",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751843923.675659",
+                "reply_count": 13,
+                "reply_users_count": 2,
+                "latest_reply": "1751935068.565469",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751935068.565469",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "kSdAo",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " who am I"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751843912.274999",
+                "client_msg_id": "d59b76ab-bcad-4fc0-8410-e287b24aa21e",
+                "text": "My name is ABC",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "B+Sio",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "My name is ABC"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751843899.767239",
+                "client_msg_id": "1e4395a9-d201-4727-8482-51c63a803ad6",
+                "text": "I like spicy food",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "P7IhX",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "I like spicy food"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751843881.808029",
+                "client_msg_id": "31042372-8757-45fd-892a-dca74d9a4f1e",
+                "text": "I am in Toronto",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "RkDLz",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "I am in Toronto"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751842749.163699",
+                "client_msg_id": "812409fb-2094-4304-a714-0562b3417469",
+                "text": "hi <@U093KDK0PPW> let's talk",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751842749.163699",
+                "reply_count": 12,
+                "reply_users_count": 2,
+                "latest_reply": "1751843026.895439",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751843026.895439",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "nmbVG",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " let's talk"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751842496.108609",
+                "client_msg_id": "857d2f2a-9f9b-4064-b8bf-54a1d667992f",
+                "text": "hi <@U093KDK0PPW> show me something interesting",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751842496.108609",
+                "reply_count": 1,
+                "reply_users_count": 1,
+                "latest_reply": "1751842498.742619",
+                "reply_users": [
+                    "U093KDK0PPW"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751842498.742619",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "DOf7r",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " show me something interesting"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751842312.808579",
+                "client_msg_id": "44edbd52-5263-4e84-89ea-fc50a0e78800",
+                "text": "hi <@U093KDK0PPW> show me something",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751842312.808579",
+                "reply_count": 2,
+                "reply_users_count": 2,
+                "latest_reply": "1751842346.150829",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751842346.150829",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "Dwy5F",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " show me something"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751842249.585849",
+                "client_msg_id": "0706480c-c9d8-463e-a675-fa329fe8cec7",
+                "text": "hi <@U093KDK0PPW> show me something",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751842249.585849",
+                "reply_count": 1,
+                "reply_users_count": 1,
+                "latest_reply": "1751842252.607539",
+                "reply_users": [
+                    "U093KDK0PPW"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751842252.607539",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "Dwy5F",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " show me something"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751842009.924949",
+                "client_msg_id": "475b02ae-ef99-4bfc-9db6-cf2589682885",
+                "text": "hi <@U093KDK0PPW> let's talk",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751842009.924949",
+                "reply_count": 5,
+                "reply_users_count": 2,
+                "latest_reply": "1751842065.390999",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751842065.390999",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "nmbVG",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " let's talk"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751841806.756389",
+                "client_msg_id": "cbd914c3-63a0-464c-882a-619f990c9eac",
+                "text": "hi <@U093KDK0PPW> let's talk",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751841806.756389",
+                "reply_count": 8,
+                "reply_users_count": 2,
+                "latest_reply": "1751841844.629199",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751841844.629199",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "nmbVG",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " let's talk"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751838374.643419",
+                "client_msg_id": "8ff392ae-9821-427b-b1a3-f8c292f971f1",
+                "text": "unless I mention it <@U093KDK0PPW>",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751838374.643419",
+                "reply_count": 9,
+                "reply_users_count": 2,
+                "latest_reply": "1751838859.090069",
+                "reply_users": [
+                    "U093KDK0PPW",
+                    "U093KD43HHA"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751838859.090069",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "Zd\/Su",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "unless I mention it "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751838358.004919",
+                "client_msg_id": "d62853ab-ca93-419c-aec5-7e67605038b6",
+                "text": "the bot should keep quiet",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "q2jJm",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "the bot should keep quiet"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751838229.552089",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Hello!",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "deleted": false,
+                    "name": "TTBot",
+                    "updated": 1751161295,
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "W+CIZ",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Hello!"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751838229.046919",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Got a message: \"a plain msg\"",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "3HY",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Got a message: \"a plain msg\""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751838227.609379",
+                "client_msg_id": "fffe5c1b-97a4-49c4-9734-0723074185f8",
+                "text": "a plain msg",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "6450Z",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "a plain msg"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751838197.106089",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "It looks like you're trying to mention someone in a Discord-style chat, but I'm a text-based AI assistant and don't support direct mentions or special formatting. However, I can try to respond as if I were in a normal chat.\n\nHi! How can I help you today?",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "d7C",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "It looks like you're trying to mention someone in a Discord-style chat, but I'm a text-based AI assistant and don't support direct mentions or special formatting. However, I can try to respond as if I were in a normal chat.\n\nHi! How can I help you today?"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751838194.626089",
+                "client_msg_id": "dac40182-9e8d-439e-b4e2-1647f7fd9e5a",
+                "text": "hi <@U093KDK0PPW> test",
+                "team": "T093KD42SLC",
+                "thread_ts": "1751838194.626089",
+                "reply_count": 1,
+                "reply_users_count": 1,
+                "latest_reply": "1751838196.341619",
+                "reply_users": [
+                    "U093KDK0PPW"
+                ],
+                "is_locked": false,
+                "subscribed": true,
+                "last_read": "1751838196.341619",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "ZHaXe",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " test"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837998.322219",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "It looks like you're trying to mention someone, but I'm a text-based AI assistant and don't have the capability to directly interact with external users or recognize custom mentions like <@U...>. \n\nIf you're looking to start a conversation or ask a question, I'm here to help! How can I assist you today?",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "zZB\/",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "It looks like you're trying to mention someone, but I'm a text-based AI assistant and don't have the capability to directly interact with external users or recognize custom mentions like "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U..."
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": ". \n\nIf you're looking to start a conversation or ask a question, I'm here to help! How can I assist you today?"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837997.451839",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Got your message: \"hi <@U093KDK0PPW> how are you\"",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "wDnpp",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Got your message: \"hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " how are you\""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751837995.672139",
+                "client_msg_id": "73b57e5c-921b-4c58-9774-87643e10596e",
+                "text": "hi <@U093KDK0PPW> how are you",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "6v\/9U",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "hi "
+                                    },
+                                    {
+                                        "type": "user",
+                                        "user_id": "U093KDK0PPW"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": " how are you"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837464.279399",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "My training data was cut off at the end of 2022, but I can provide information on a wide range of topics and answer questions to the best of my knowledge based on that data.",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "jPy",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "My training data was cut off at the end of 2022, but I can provide information on a wide range of topics and answer questions to the best of my knowledge based on that data."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837462.760529",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Got your message: \"what's the latest date of your training data?\"",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "O2XgC",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Got your message: \"what's the latest date of your training data?\""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751837461.406229",
+                "client_msg_id": "bfb83dbb-6226-4216-9a23-e18aed9dfc66",
+                "text": "what's the latest date of your training data?",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "xNI+D",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "what's the latest date of your training data?"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837433.690989",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "I'm doing well, thank you for asking! I'm a large language model, so I don't have feelings or emotions like humans do, but I'm functioning properly and ready to assist you with any questions or topics you'd like to discuss. How about you? How's your day going so far?",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "ORfg",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "I'm doing well, thank you for asking! I'm a large language model, so I don't have feelings or emotions like humans do, but I'm functioning properly and ready to assist you with any questions or topics you'd like to discuss. How about you? How's your day going so far?"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837432.951169",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Got your message: \"how are you\"",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "ILKr9",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Got your message: \"how are you\""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KD43HHA",
+                "type": "message",
+                "ts": "1751837431.599869",
+                "client_msg_id": "4071495b-3ca5-43f9-b890-1939be6ae378",
+                "text": "how are you",
+                "team": "T093KD42SLC",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "W9Uyc",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "how are you"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837356.582789",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "The capital of France is Paris.",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "v4r",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "The capital of France is Paris."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "user": "U093KDK0PPW",
+                "type": "message",
+                "ts": "1751837356.093169",
+                "bot_id": "B093KDK0JQ4",
+                "app_id": "A093XHS5ZGR",
+                "text": "Got your message: \"again\"",
+                "team": "T093KD42SLC",
+                "bot_profile": {
+                    "id": "B093KDK0JQ4",
+                    "app_id": "A093XHS5ZGR",
+                    "user_id": "U093KDK0PPW",
+                    "name": "TTBot",
+                    "icons": {
+                        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+                    },
+                    "deleted": false,
+                    "updated": 1751161295,
+                    "team_id": "T093KD42SLC"
+                },
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "fpn",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [
+                                    {
+                                        "type": "text",
+                                        "text": "Got your message: \"again\""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "has_more": true,
+        "mutation_timestamps": {
+            "latest": "1751843923.675659",
+            "updated": "1751935068.000100",
+            "history_invalid": "0000000000.000000"
+        },
+        "channel_actions_ts": null,
+        "channel_actions_count": 0,
+        "next_ts": 1751837355135889
+    },
+    "users": [
+        {
+            "id": "U093KD43HHA",
+            "name": "yultao",
+            "is_bot": false,
+            "updated": 1751160546,
+            "is_app_user": false,
+            "team_id": "T093KD42SLC",
+            "deleted": false,
+            "color": "5870dd",
+            "is_email_confirmed": true,
+            "real_name": "G T",
+            "tz": "America\/New_York",
+            "tz_label": "Eastern Daylight Time",
+            "tz_offset": -14400,
+            "is_admin": true,
+            "is_owner": true,
+            "is_primary_owner": true,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "has_2fa": false,
+            "who_can_share_contact_card": "EVERYONE",
+            "profile": {
+                "real_name": "G T",
+                "display_name": "",
+                "avatar_hash": "33faec949723",
+                "real_name_normalized": "G T",
+                "display_name_normalized": "",
+                "image_original": "https:\/\/s3-us-west-2.amazonaws.com\/slack-files2\/avatars\/2025-06-28\/9120423747122_33faec949723ba326bf6_original.png",
+                "is_custom_image": true,
+                "first_name": "G",
+                "last_name": "T",
+                "team": "T093KD42SLC",
+                "email": "yultao@gmail.com",
+                "title": "",
+                "phone": "",
+                "skype": "",
+                "status_text": "",
+                "status_text_canonical": "",
+                "status_emoji": "",
+                "status_emoji_display_info": [],
+                "status_expiration": 0
+            }
+        },
+        {
+            "id": "U093KDK0PPW",
+            "name": "ttbot",
+            "is_bot": true,
+            "updated": 1751161295,
+            "is_app_user": false,
+            "team_id": "T093KD42SLC",
+            "deleted": false,
+            "color": "4cc091",
+            "is_email_confirmed": false,
+            "real_name": "TTBot",
+            "tz": "America\/Los_Angeles",
+            "tz_label": "Pacific Daylight Time",
+            "tz_offset": -25200,
+            "is_admin": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "who_can_share_contact_card": "EVERYONE",
+            "profile": {
+                "real_name": "TTBot",
+                "display_name": "",
+                "avatar_hash": "g4664c143077",
+                "real_name_normalized": "TTBot",
+                "display_name_normalized": "",
+                "first_name": "TTBot",
+                "last_name": "",
+                "team": "T093KD42SLC",
+                "title": "",
+                "phone": "",
+                "skype": "",
+                "status_text": "",
+                "status_text_canonical": "",
+                "status_emoji": "",
+                "status_emoji_display_info": [],
+                "status_expiration": 0,
+                "bot_id": "B093KDK0JQ4",
+                "api_app_id": "A093XHS5ZGR",
+                "always_active": false
+            }
+        }
+    ],
+    "bots": [
+        {
+            "id": "B093KDK0JQ4",
+            "deleted": false,
+            "name": "TTBot",
+            "updated": 1751161295,
+            "app_id": "A093XHS5ZGR",
+            "icons": {
+                "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+            }
+        }
+    ],
+    "channels": [],
+    "emojis": {},
+    "channel": {
+        "id": "C093GASKAKF",
+        "name": "new-channel",
+        "is_channel": true,
+        "is_group": false,
+        "is_im": false,
+        "is_mpim": false,
+        "is_private": false,
+        "created": 1751160575,
+        "is_archived": false,
+        "is_general": false,
+        "unlinked": 0,
+        "name_normalized": "new-channel",
+        "is_shared": false,
+        "is_frozen": false,
+        "is_org_shared": false,
+        "is_pending_ext_shared": false,
+        "pending_shared": [],
+        "context_team_id": "T093KD42SLC",
+        "updated": 1751160575345,
+        "parent_conversation": null,
+        "creator": "U093KD43HHA",
+        "use_case": "project",
+        "is_ext_shared": false,
+        "shared_team_ids": [
+            "T093KD42SLC"
+        ],
+        "pending_connected_team_ids": [],
+        "is_member": true,
+        "last_read": "1751935068.565469",
+        "latest": "1751935068.565469",
+        "unread_count": 0,
+        "unread_count_display": 0,
+        "topic": {
+            "value": "",
+            "creator": "",
+            "last_set": 0
+        },
+        "purpose": {
+            "value": "This channel is for everything #new-channel. Hold meetings, share docs, and make decisions together with your team.",
+            "creator": "U093KD43HHA",
+            "last_set": 1751160575
+        },
+        "properties": {
+            "use_case": "project"
+        },
+        "previous_names": []
+    },
+    "response_metadata": {
+        "next_cursor": "bmV4dF90czoxNzUxODM3MzU1MTM1ODg5"
+    }
+}

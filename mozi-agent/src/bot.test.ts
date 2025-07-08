@@ -19,9 +19,9 @@ async function loopChat() {
     const bot = new Bot();
     await bot.loopChat();
 }
-// await askSingleQuestion();
+await askSingleQuestion();
 // await conversation();
-await loopChat();
+//await loopChat();
 
 // test('ask and answer', () => {
 //     expect(tt()).toBe(3);

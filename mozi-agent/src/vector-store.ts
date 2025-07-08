@@ -23,7 +23,7 @@ export default class VectorStore {
         
         const top = scored.sort((a, b) => b.score - a.score).slice(0, topk);
 
-        logInfo(`Found ${scored.length} similar records from ${this.vectorStore.length} records. Will return top 3 ${JSON.stringify(top.map(t=>t.score))} after sorting by score descending`)
+        logInfo(`Found top 3 ${JSON.stringify(top.map(t=>t.score.toFixed(2)))} from ${this.vectorStore.length} records`)
         return top;
     }
 

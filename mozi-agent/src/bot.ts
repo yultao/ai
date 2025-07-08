@@ -1,7 +1,7 @@
 
 // import MCPClient from './mcp-client.js';
 import MyAgent from './ai-agent.js';
-import { logInfo, logTitle, logError } from "./logger.js";
+import { logInfo, logError } from "./logger.js";
 import AiConfig from './config.js';
 import { createInterface } from "readline/promises";
 import KnowledgeContext from './knowledge-context.js';
@@ -15,6 +15,12 @@ export default class Bot {
 
     }
 
+    /**
+     * Create an agent
+     * @param knowledgeDir - always try to retrieve context from knowledgeDir 
+     * @param prompt - if present, retrieve sepecific context according to prompt, otherwise full context
+     * @returns 
+     */
     private async createAgent(knowledgeDir: string = "knowledge", prompt?:string) {
         logInfo("Starting my-agent...");
         // Parse command line arguments
@@ -24,7 +30,7 @@ export default class Bot {
         const aiConfig = AiConfig.getInstance(this.aiConfigPath);
         const servers = aiConfig.getMcpServerConfigs();
         const mcpServers = servers.filter(server => !server.disabled);
-        logInfo(`Using MCP servers: ${JSON.stringify(mcpServers)}`);
+        logInfo(`Using MCP servers: ${JSON.stringify(mcpServers.map(s=>s.name))}`);
         // const mcpClients = activeServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
 
 
@@ -32,12 +38,12 @@ export default class Bot {
         const apiProviderConfig = aiConfig.getApiProviderConfig();
 
         const apiKey = process.env.OPENAI_API_KEY || apiProviderConfig.apiKey;
-        const apiBaseURL = apiProviderConfig.apiBaseURL;;
-        logInfo(`Using Provider API Key: ${apiKey}`);
+        const apiBaseURL = apiProviderConfig.apiBaseURL;
+        logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(apiKey.length - 5)}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
 
         const model = args[0] || aiConfig.getModelConfig();
-        logInfo(`Using model: ${model}`);
+        logInfo(`Using LLM model: ${model}`);
 
 
 
@@ -47,10 +53,10 @@ export default class Bot {
         logInfo(`Using system prompt: ${systemPrompt}`);
 
         const embeddingConfig = aiConfig.getEmbeddingConfig();
-        logInfo(`Using Embedding model: ${embeddingConfig.model}`);
+        logInfo(`Using embedding model: ${embeddingConfig.model}`);
 
 
-        logInfo(`Using Knowledge DIR: ${knowledgeDir}`);
+        logInfo(`Using knowledge folder: ${knowledgeDir}`);
         const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
         const context = await knowledgeContext.retrieveContext(prompt); 
 
@@ -120,7 +126,7 @@ export default class Bot {
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }
-                const content = await myAgent.invoke(prompt);
+                await myAgent.invoke(prompt);
             }
         } catch (error) {
             logError(`Error invoking agent: ${error}`);
