@@ -2,6 +2,25 @@
   {
     "user": "U093KD43HHA",
     "type": "message",
+    "ts": "1751843921.675659",
+    "client_msg_id": "older",
+    "text": "hi <@U093KDK0PPW> who am I",
+    "team": "T093KD42SLC",
+    "thread_ts": "1751843923.675659",
+    "reply_count": 13,
+    "reply_users_count": 2,
+    "latest_reply": "1751935068.565469",
+    "reply_users": [
+      "U093KDK0PPW",
+      "U093KD43HHA"
+    ],
+    "is_locked": false,
+    "subscribed": true,
+    "last_read": "1751935068.565469"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
     "ts": "1751843923.675659",
     "client_msg_id": "dd9fcdf2-c12a-4a43-9807-de0b2db766ad",
     "text": "hi <@U093KDK0PPW> who am I",

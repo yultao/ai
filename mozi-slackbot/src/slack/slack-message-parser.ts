@@ -2,10 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 type SlackMessage = {
+  client_msg_id?: string;
+  ts: string;
   [key: string]: any;
 };
 
-export default class SlackConversationParser {
+export class SlackConversationParser {
   private rootPath: string;
   private outputPath: string;
 
@@ -29,13 +31,13 @@ export default class SlackConversationParser {
         const outputFilePath = path.join(this.outputPath, `${dirName}.json`);
         fs.writeFileSync(outputFilePath, JSON.stringify(messages, null, 2), 'utf-8');
 
-        console.log(`Saved ${messages.length} messages to ${outputFilePath}`);
+        console.log(`✅ Saved ${messages.length} messages to ${outputFilePath}`);
       }
     }
   }
 
   private parseMessagesFromFolder(folderPath: string): SlackMessage[] {
-    let allMessages: SlackMessage[] = [];
+    const clientMsgMap: Map<string, SlackMessage> = new Map();
     const files = fs.readdirSync(folderPath);
 
     for (const file of files) {
@@ -46,30 +48,35 @@ export default class SlackConversationParser {
           const parsed = JSON.parse(raw);
 
           const messages = this.extractMessages(parsed);
-          const cleaned = messages.map((msg: SlackMessage) => {
-            const { blocks, ...rest } = msg;
-            return rest;
-          });
 
-          allMessages.push(...cleaned);
+          for (const msg of messages) {
+            const { blocks, ...cleaned } = msg;
+            const id = msg.client_msg_id || `${msg.ts}-${Math.random()}`;
+
+            // Skip if already added (by client_msg_id)
+            if (!clientMsgMap.has(id)) {
+              clientMsgMap.set(id, cleaned);
+            }
+          }
         } catch (err) {
-          console.warn(`Failed to parse ${filePath}: ${err}`);
+          console.warn(`⚠️ Failed to parse ${filePath}: ${err}`);
         }
       }
     }
 
-    return allMessages;
+    // Sort by timestamp
+    return Array.from(clientMsgMap.values()).sort((a, b) =>
+      parseFloat(a.ts) - parseFloat(b.ts)
+    );
   }
 
   private extractMessages(json: any): SlackMessage[] {
     if (Array.isArray(json.messages)) {
       return json.messages;
     }
-
     if (json.history && Array.isArray(json.history.messages)) {
       return json.history.messages;
     }
-
-    return []; // fallback if neither exists
+    return [];
   }
 }
