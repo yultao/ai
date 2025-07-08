@@ -23,9 +23,9 @@ async function testAgent() {
     // ];
     const aiConfig = AiConfig.getInstance();
     const servers = aiConfig.getMcpServerConfigs();
-    const activeServers = servers.filter(server => !server.disabled);
-    logInfo(`Using servers: ${JSON.stringify(activeServers)}`);
-    const mcpClients = activeServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
+    const mcpServers = servers.filter(server => !server.disabled);
+    logInfo(`Using MCP servers: ${JSON.stringify(mcpServers)}`);
+    // const mcpClients = mcpServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
 
     dotenv.config();
     const apiProviderConfig = aiConfig.getApiProviderConfig();
@@ -48,7 +48,7 @@ async function testAgent() {
     
     const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
     const context = await knowledgeContext.retrieveContext(prompt);
-    const myAgent = new MyAgent(mcpClients, providerApiKey, providerApiBaseURL, model, systemPrompt, context);
+    const myAgent = new MyAgent(mcpServers, providerApiKey, providerApiBaseURL, model, systemPrompt, context);
     await myAgent.init();
     let response;
 

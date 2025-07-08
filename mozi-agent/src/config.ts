@@ -27,7 +27,7 @@ interface Config {
   embedding: EmbeddingConfig;
 }
 
-interface ServerEntry {
+export interface ServerEntry {
   name: string;
   command: string;
   args: string[];

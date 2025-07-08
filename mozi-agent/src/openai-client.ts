@@ -55,7 +55,7 @@ export default class OpenAIClient {
                 model: this.model,
                 messages: this.messages,
                 stream: true,
-                tools: this.getOpenAITools(),
+                tools: this.getOpenAITools(),//tell openai the available tools
 
             });
 
@@ -113,6 +113,8 @@ export default class OpenAIClient {
         } catch (err) {
             logWarn(`Warn invoking chat: ${err}`);
         }
+
+        //suggested tools by openai
         let toolCalls: ToolCall[] = Array.from(toolCallsMap.values());
         // push the final message to the messages array
         this.appendMessages({
@@ -127,7 +129,7 @@ export default class OpenAIClient {
                 },
             })),
         });
-        // Filter out any undefined tool calls
+
         return { content, toolCalls };
     }
 

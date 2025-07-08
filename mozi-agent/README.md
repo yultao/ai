@@ -16,8 +16,9 @@ A **headless AI agent framework** built for LLM applications. Features include:
 > Architecture documentation coming soon.
 
 
-Agent (mcp clients) 
- - create openai
+Agent (context) 
+  - create mcp clients
+  - create openai client
 
 ---
 

@@ -2,9 +2,10 @@ import { logError, logInfo, logTitle } from "./logger.js";
 import MCPClient from "./mcp-client.js";
 import OpenAIClient from "./openai-client.js";
 
-
+import {ServerEntry} from "./config.js";
 export default class MyAgent {
-    private mcpClients: MCPClient[];
+    private mcpServers: ServerEntry[];
+    private mcpClients: MCPClient[] = [];
     private openAIClient: OpenAIClient | null = null; // Replace with actual type
     private model: string;
     private apiKey: string;
@@ -12,14 +13,16 @@ export default class MyAgent {
     private systemPrompt: string;
     private context: string;
     constructor(
-        mcpClients: MCPClient[] = [],
+        mcpServers: ServerEntry[],
+        // mcpClients: MCPClient[] = [],
         apiKey: string,
         apiBaseURL: string,
         model: string,
         systemPrompt: string,
         context: string
     ) {
-        this.mcpClients = mcpClients;
+        this.mcpServers = mcpServers;
+        // this.mcpClients = mcpClients;
         this.model = model;
         this.apiKey = apiKey;
         this.apiBaseURL = apiBaseURL;
@@ -28,15 +31,16 @@ export default class MyAgent {
     }
 
     public async init() {
-        logInfo("Initializing MyAgent with model: " + this.model);
+        logInfo("Initializing agent with model: " + this.model);
         // Initialize MCP clients
+        this.mcpClients = this.mcpServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
         for (const client of this.mcpClients) {
             await client.init();
         }
 
         // Collect tools from all MCP clients
         const tools = this.mcpClients.flatMap(client => client.getTools());
-        logInfo(`Collected ${tools.length} tools from MCP clients.`);
+        //logInfo(`Collected ${tools.length} tools from MCP clients.`);
         // Initialize OpenAI client with the provided model, system prompt, tools, and context
         this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
 
@@ -47,10 +51,7 @@ export default class MyAgent {
             throw new Error("OpenAI client is not initialized.");
         }
 
-
-        console.log("before");
         let response = await this.openAIClient!.chat(prompt);
-        console.log("after response " + JSON.stringify(response));
         while (true) {
 
             if (response.toolCalls.length > 0) {

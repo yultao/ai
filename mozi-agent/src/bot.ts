@@ -1,5 +1,5 @@
 
-import MCPClient from './mcp-client.js';
+// import MCPClient from './mcp-client.js';
 import MyAgent from './ai-agent.js';
 import { logInfo, logTitle, logError } from "./logger.js";
 import AiConfig from './config.js';
@@ -23,9 +23,9 @@ export default class Bot {
 
         const aiConfig = AiConfig.getInstance(this.aiConfigPath);
         const servers = aiConfig.getMcpServerConfigs();
-        const activeServers = servers.filter(server => !server.disabled);
-        logInfo(`Using servers: ${JSON.stringify(activeServers)}`);
-        const mcpClients = activeServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
+        const mcpServers = servers.filter(server => !server.disabled);
+        logInfo(`Using MCP servers: ${JSON.stringify(mcpServers)}`);
+        // const mcpClients = activeServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
 
 
         dotenv.config();
@@ -55,7 +55,7 @@ export default class Bot {
         const context = await knowledgeContext.retrieveContext(prompt); 
 
 
-        const myAgent = new MyAgent(mcpClients, apiKey, apiBaseURL, model, systemPrompt, context);
+        const myAgent = new MyAgent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
 
 
         await myAgent.init();
@@ -116,7 +116,7 @@ export default class Bot {
         try {
 
             while (true) {
-                const prompt = await rl.question("Enter your prompt (or exit): ");
+                const prompt = await rl.question("mozi> ");
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }
