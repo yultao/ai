@@ -1,0 +1,5 @@
+{
+  "action": "tool/run",
+  "tool": "add",
+  "parameters": { "a": 3, "b": 5 }
+}
