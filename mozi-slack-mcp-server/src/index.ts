@@ -2,7 +2,7 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import Slack from '@slack/bolt';
-import { SlackReader } from "./slack-reader.js
+import { SlackReader } from "./slack-reader.js"
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 
@@ -25,59 +25,6 @@ const now = Math.floor(Date.now() / 1000);
 const sometimeAgo: string = (now - 2400 * 60 * 60).toString();
 
 
-async function fetchSlackMessages2(
-  token: string,
-  channelId: string,
-  limit: number = 100,
-  names?: string[]
-): Promise<string[]> {
-  try {
-    let userIds: Set<string> = new Set();
-
-    if (names && names.length > 0) {
-      const usersResult = await app.client.users.list({ token });
-      const members = usersResult.members ?? [];
-
-      for (const name of names) {
-        const user = members.find(
-          (u) => u.name === name || u.real_name === name
-        );
-        if (user?.id) {
-          userIds.add(user.id);
-        } else {
-          console.warn(`User "${name}" not found.`);
-        }
-      }
-    }
-
-    const result = await app.client.conversations.history({
-      channel: channelId,
-      limit: limit,
-      token,
-    });
-
-    const messagesText: string[] = [];
-
-    if (result.messages) {
-      for (const msg of result.messages) {
-        const text = msg.text ?? '';
-        const sender = msg.user;
-
-        const isMention = Array.from(userIds).some((id) => text.includes(`<@${id}>`));
-        const isFromUser = userIds.has(sender ?? '');
-
-        if (userIds.size === 0 || isMention || isFromUser) {
-          messagesText.push(text);
-        }
-      }
-    }
-
-    return messagesText;
-  } catch (err) {
-    console.error('Failed to fetch messages:', err);
-    return [];
-  }
-}
 
 async function fetchSlackMessages(token: string,
   channelId: string,
@@ -128,6 +75,23 @@ server.registerTool("add",
   }
 );
 
+
+
+server.registerTool("read-slack-conversations",
+  {
+    title: "Slack Reader",
+    description: "Read Slack Converstaions History"
+  },
+  async (_input, context) => {
+   
+      const slackReader = new SlackReader();
+      const results = await slackReader.getMessages();
+      return ({
+      content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
+    });
+  }
+);
+
 // server.registerTool("read-slack-conversations",
 //   {
 //     title: "Slack Reader",
@@ -162,31 +126,31 @@ server.registerTool("add",
 // );
 
 
-async function getJoinedChannelMap(): Promise<Record<string, string>> {
-  try {
-    const result = await app.client.conversations.list({
-      types: 'public_channel,private_channel',
-      exclude_archived: true,
-    });
+// async function getJoinedChannelMap(): Promise<Record<string, string>> {
+//   try {
+//     const result = await app.client.conversations.list({
+//       types: 'public_channel,private_channel',
+//       exclude_archived: true,
+//     });
 
-    const channels = result.channels ?? [];
+//     const channels = result.channels ?? [];
 
-    const joinedChannelMap: Record<string, string> = {};
+//     const joinedChannelMap: Record<string, string> = {};
 
-    for (const channel of channels) {
-      if (channel.is_member && channel.id && channel.name) {
-        joinedChannelMap[channel.id] = channel.name;
-      }
-    }
+//     for (const channel of channels) {
+//       if (channel.is_member && channel.id && channel.name) {
+//         joinedChannelMap[channel.id] = channel.name;
+//       }
+//     }
 
-    return joinedChannelMap;
-  } catch (error) {
-    console.error('Failed to fetch joined channels:', error);
-    return {};
-  }
-}
+//     return joinedChannelMap;
+//   } catch (error) {
+//     console.error('Failed to fetch joined channels:', error);
+//     return {};
+//   }
+// }
 
-async function getChannelName(channelId: string): Promise<string | null> {
+ async function getChannelName(channelId: string): Promise<string | null> {
   try {
     const result = await app.client.conversations.info({
       channel: channelId,
@@ -201,23 +165,6 @@ async function getChannelName(channelId: string): Promise<string | null> {
     return null;
   }
 }
-
-
-
-server.registerTool("read-slack-conversations",
-  {
-    title: "Slack Reader",
-    description: "Read Slack Converstaions History"
-  },
-  async (_input, context) => {
-   
-      const slackReader = new SlackReader();
-      const results = await slackReader.getMessages();
-      return ({
-      content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
-    });
-  }
-);
 
 server.registerResource(
   "get-channel-name",

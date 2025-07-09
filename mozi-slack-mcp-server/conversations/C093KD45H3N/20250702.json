@@ -1,0 +1,72 @@
+[
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751488444.419909",
+    "client_msg_id": "edc7cc21-bc8f-4c6d-8c60-f09fcdcc4ccf",
+    "text": "This is sent to all-tt",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751508363.036529",
+    "client_msg_id": "a807aa58-8742-4497-94f9-ed2c1c7a3b73",
+    "text": "I did something else in all-tt",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751508376.673459",
+    "client_msg_id": "8ca96ca3-b77f-4169-9c28-6397bdf0c4de",
+    "text": "I called ads team for a bug",
+    "team": "T093KD42SLC",
+    "thread_ts": "1751508376.673459",
+    "reply_count": 3,
+    "reply_users_count": 1,
+    "latest_reply": "1752028309.978439",
+    "reply_users": [
+      "U093KD43HHA"
+    ],
+    "is_locked": false,
+    "subscribed": true,
+    "last_read": "1752028309.978439",
+    "replies": [
+      {
+        "user": "U093KD43HHA",
+        "type": "message",
+        "ts": "1752025744.203449",
+        "edited": {
+          "user": "U093KD43HHA",
+          "ts": "1752025943.000000"
+        },
+        "client_msg_id": "2d9d4c55-30d4-4fb0-b3d1-5febadf8562d",
+        "text": "ttaab",
+        "team": "T093KD42SLC",
+        "thread_ts": "1751508376.673459",
+        "parent_user_id": "U093KD43HHA"
+      },
+      {
+        "user": "U093KD43HHA",
+        "type": "message",
+        "ts": "1752025796.443399",
+        "client_msg_id": "6627f31c-1369-4beb-ae7a-a808323e4391",
+        "text": "ttb",
+        "team": "T093KD42SLC",
+        "thread_ts": "1751508376.673459",
+        "parent_user_id": "U093KD43HHA"
+      },
+      {
+        "user": "U093KD43HHA",
+        "type": "message",
+        "ts": "1752028309.978439",
+        "client_msg_id": "c209e398-c5ed-4fd2-8da7-2875027cf402",
+        "text": "ttc",
+        "team": "T093KD42SLC",
+        "thread_ts": "1751508376.673459",
+        "parent_user_id": "U093KD43HHA"
+      }
+    ]
+  }
+]

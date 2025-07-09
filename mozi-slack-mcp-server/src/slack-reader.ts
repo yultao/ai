@@ -1,23 +1,34 @@
 import Bolt from '@slack/bolt';
 import dotenv from 'dotenv';
+import { WebAPICallResult } from '@slack/web-api';
+
+import * as fs from 'fs/promises';
+import * as path from 'path';
 dotenv.config();
 
 interface SlackMessageResult {
   content: { type: string; text: string }[];
 }
+type SlackMessage = {
+  ts: string;
+  thread_ts?: string;
+  text: string;
+  [key: string]: any;
+  replies: SlackMessage[]
+};
+
 
 export class SlackReader {
-  
+
   private app: InstanceType<typeof Bolt.App>;
   private readonly token: string;
   private readonly signingSecret: string;
-  private readonly userChannelId?: string;
   private readonly tenHoursAgo: number;
 
   constructor() {
+
     this.token = process.env.SLACK_USER_TOKEN!;
     this.signingSecret = process.env.SLACK_USER_SIGNING_SECRET!;
-    this.userChannelId = process.env.SLACK_USER_CHANNEL_ID;
     this.tenHoursAgo = Math.floor(Date.now() / 1000) - 10 * 60 * 60;
 
     this.app = new Bolt.App({
@@ -28,29 +39,50 @@ export class SlackReader {
 
     console.log(`SlackReader initialized with token: ${this.token}, secret: ${this.signingSecret}`);
   }
+  public async getMessages(): Promise<SlackMessageResult> {
+    const results: Record<string, any> = {};
+    const channelMap = this.getChannelMap() || await this.getJoinedChannelMap();
+    console.log('Joined channel names:', channelMap);
 
-  async getRecentMessages(): Promise<void> {
-    try {
-      if (!this.userChannelId) {
-        throw new Error('SLACK_USER_CHANNEL_ID is not defined in environment variables.');
+    // const users = await this.app.client.users.list({});
+    // const george = users.members?.find(u => u.real_name === 'G T');
+
+    // if (!george?.id) {
+    //   throw new Error('User G T not found');
+    // }
+
+    // const userId = george.id;
+    // console.log(`G T's user ID: ${userId}`);
+
+    for (const [channelId, channelName] of Object.entries(channelMap)) {
+      const result = await this.fetchMessages(channelId, "userId");
+      results[`${channelName}(${channelId})`] = result;
+      break;
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Slack conversations:\n${JSON.stringify(results, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  private getChannelMap(): Record<string, string> | undefined {
+    const rawMap = process.env.SLACK_CHANNELS;
+
+    if (rawMap) {
+      try {
+        return JSON.parse(rawMap);
+      } catch (err) {
+        throw new Error('Invalid JSON in SLACK_CHANNELS: ' + err);
       }
-
-      const result = await this.app.client.conversations.history({
-        channel: this.userChannelId,
-        oldest: this.tenHoursAgo.toString(),
-        limit: 100,
-      });
-
-      console.log(`Messages from the past 10 hours:`);
-      result.messages?.forEach((msg, index) => {
-        console.log(`[${new Date(+msg.ts! * 1000).toLocaleString()}]: ${index + 1}. ${msg.text}`);
-      });
-    } catch (err) {
-      console.error('Failed to fetch messages:', err);
     }
   }
 
-  async getJoinedChannelMap(): Promise<Record<string, string>> {
+  private async getJoinedChannelMap(): Promise<Record<string, string>> {
     try {
       const result = await this.app.client.conversations.list({
         types: 'public_channel,private_channel',
@@ -73,58 +105,163 @@ export class SlackReader {
     }
   }
 
-  async fetchMessages(channelId: string, userId: string): Promise<void> {
+
+  private async fetchMessages(channel: string, userId: string): Promise<string> {
     try {
-      const result = await this.app.client.conversations.history({
-        channel: channelId,
-        oldest: this.tenHoursAgo.toString(),
-        limit: 100,
+      const existingMessages = await this.loadMessagesByTs("conversations/" + channel);
+      const messages: SlackMessage[] = await this.fetchChannelThreads(channel, existingMessages);
+      this.writeMessagesGroupedByDate(messages, "conversations/" + channel);
+      return JSON.stringify(messages);
+    } catch (err) {
+      console.error('Error fetching messages for channel', channel, err);
+    }
+    return "";
+  }
+  async loadMessagesByTs(
+    channelId: string
+  ): Promise<Record<string, SlackMessage>> {
+    const dir = path.join(channelId);
+    const messages: Record<string, SlackMessage> = {};
+
+    try {
+      const files = await fs.readdir(dir);
+
+      for (const file of files) {
+        const fullPath = path.join(dir, file);
+        try {
+          const content = await fs.readFile(fullPath, 'utf-8');
+          const array: SlackMessage[] = JSON.parse(content);
+
+          for (const msg of array) {
+            if (msg.ts) {
+              messages[msg.ts] = msg;
+            }
+          }
+        } catch (err) {
+          console.warn(`⚠️ Failed to parse ${file}:`, err);
+        }
+      }
+      //console.warn(`⚠️ existing:`, JSON.stringify(messages));
+      return messages;
+    } catch (err) {
+      console.warn(`⚠️ err:`, JSON.stringify(err));
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        return {};
+      }
+      throw err;
+    }
+  }
+
+  private async fetchChannelThreads(channel: string, existingMessages: Record<string, SlackMessage>): Promise<SlackMessage[]> {
+    // const result: SlackMessage[] = [];
+    const newMessages = (await this.fetchAllMessages(channel)).sort((a, b) => Number(a.ts) - Number(b.ts));
+    for (const msg of newMessages) {
+      delete msg.blocks;
+      delete msg.bot_profile;
+    }
+    console.log("allMessages for " + channel + ": " + newMessages.length);
+
+    for (const msg of newMessages) {
+      // 只处理主消息（不是别人回复的）
+      if (msg.thread_ts) {
+        const old = existingMessages[msg.ts];
+        //console.log("old " +JSON.stringify(old));
+        const needsUpdate =!old || old.reply_count !== msg.reply_count || old.latest_reply !== msg.latest_reply;
+        
+        if (needsUpdate) {
+          console.log("Update " + msg.ts + " vs " + msg.thread_ts);
+          const replies = await this.fetchReplies(channel, msg.thread_ts);
+          // 删除 replies 中的 blocks 字段
+          msg.replies = replies.slice(1).map(reply => {
+            const cleanReply = { ...reply };
+            delete cleanReply.blocks;
+            delete cleanReply.bot_profile;
+            return cleanReply;
+          });
+        } else {
+          msg.replies = old.replies;
+        }
+      }
+    }
+    console.log("fetchChannelThreads: " + JSON.stringify(newMessages));
+    return newMessages;
+  }
+
+
+  private async fetchAllMessages(channel: string): Promise<SlackMessage[]> {
+    let allMessages: SlackMessage[] = [];
+    let cursor: string | undefined = undefined;
+
+    do {
+      const result: WebAPICallResult = await this.app.client.conversations.history({
+        channel,
+        cursor,
+        limit: 200,
       });
 
-      const messages = result.messages ?? [];
+      if (result.messages) {
+        allMessages.push(...(result.messages as SlackMessage[]));
+      }
 
-      const sentByUser = messages.filter(m => m.user === userId);
-      const mentionsUser = messages.filter(m => m.text?.includes(`<@${userId}>`));
+      cursor = result.response_metadata?.next_cursor;
+    } while (cursor);
 
-      console.log(`Messages from channel ${channelId}:`);
-      messages.forEach(m =>
-        console.log(`[${new Date(+m.ts! * 1000).toLocaleString()}] ${m.text}`)
-      );
+    return allMessages;
+  }
 
-      console.log('Sent by user:', sentByUser.map(m => m.text));
-      console.log('Mentioning user:', mentionsUser.map(m => m.text));
-    } catch (err) {
-      console.error('Error fetching messages for channel', channelId, err);
+
+
+  private async fetchReplies(channel: string, threadTs: string): Promise<SlackMessage[]> {
+    let allReplies: SlackMessage[] = [];
+    let cursor: string | undefined = undefined;
+
+    do {
+      const result: WebAPICallResult = await this.app.client.conversations.replies({
+        channel,
+        ts: threadTs,
+        cursor,
+        limit: 200,
+      });
+
+      if (result.messages) {
+        allReplies.push(...(result.messages as SlackMessage[]));
+      }
+
+      cursor = result.response_metadata?.next_cursor;
+    } while (cursor);
+    console.log("fetchReplies for " + channel + ", " + threadTs + ": " + allReplies.length);
+
+    return allReplies;
+  }
+  private formatDate(ts: string): string {
+    const date = new Date(Number(ts) * 1000);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}`; // e.g. 20250708
+  }
+
+  private async writeMessagesGroupedByDate(messages: SlackMessage[], outputDir: string): Promise<void> {
+    const grouped: Record<string, SlackMessage[]> = {};
+
+    // 分组
+    for (const msg of messages) {
+      const dateKey = this.formatDate(msg.ts);
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(msg);
+    }
+
+    // 创建目录
+    await fs.mkdir(outputDir, { recursive: true });
+
+    // 写入文件
+    for (const [date, msgs] of Object.entries(grouped)) {
+      const filePath = path.join(outputDir, `${date}.json`);
+      await fs.writeFile(filePath, JSON.stringify(msgs, null, 2), 'utf-8');
+      console.log(`Wrote ${msgs.length} messages to ${filePath}`);
     }
   }
 
-  async getMessages(): Promise<SlackMessageResult> {
-    const results: Record<string, any> = {};
-    const channelMap = await this.getJoinedChannelMap();
-    console.log('Joined channel names:', channelMap);
-
-    const users = await this.app.client.users.list({});
-    const george = users.members?.find(u => u.real_name === 'G T');
-
-    if (!george?.id) {
-      throw new Error('User G T not found');
-    }
-
-    const userId = george.id;
-    console.log(`G T's user ID: ${userId}`);
-
-    for (const [channelId, channelName] of Object.entries(channelMap)) {
-      await this.fetchMessages(channelId, userId);
-      results[`${channelName}(${channelId})`] = `Fetched messages for ${channelName}`;
-    }
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Slack conversations:\n${JSON.stringify(results, null, 2)}`,
-        },
-      ],
-    };
-  }
 }
