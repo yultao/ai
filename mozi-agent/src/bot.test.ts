@@ -2,8 +2,9 @@ import Bot from './bot.js';
 
 async function askSingleQuestion() {
     const bot = new Bot();
-    const res = await bot.askSingleQuestion('Who is Leopoldo Corkery?');
-    console.log(res);
+    // const res = await bot.askSingleQuestion('Who is Leopoldo Corkery?');
+    const res = await bot.askSingleQuestion('Summarize what happened on 20250706');
+   
 }
 
 async function conversation() {
@@ -19,9 +20,9 @@ async function loopChat() {
     const bot = new Bot();
     await bot.loopChat();
 }
-await askSingleQuestion();
+// await askSingleQuestion();
 // await conversation();
-//await loopChat();
+await loopChat();
 
 // test('ask and answer', () => {
 //     expect(tt()).toBe(3);
