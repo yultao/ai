@@ -1,7 +1,7 @@
 
-import Bot  from 'mozi-agent/Bot';
+import Bot  from 'tt-agent/Bot';
 const bot = new Bot("C:/Workspace/ai/mozi-agent/aiconfig.json");
-await bot.startChat();
-console.log(await bot.chat("I am in Shanghai"));//Shanghai! The Pearl of the Orient
-console.log(await bot.chat("Where am I?"));//You are in Shanghai!
-await bot.stopChat();
+await bot.startConversation();
+console.log(await bot.continueConversation("I am in Shanghai"));//Shanghai! The Pearl of the Orient
+console.log(await bot.continueConversation("Where am I?"));//You are in Shanghai!
+await bot.stopConversation();

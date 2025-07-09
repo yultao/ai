@@ -17,8 +17,7 @@
     "axios": "^1.10.0",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
-    "mozi-agent": "^0.0.1",
-    "puppeteer": "^24.12.0"
+    "tt-agent": "file:../tt-agent/tt-agent-0.0.1.tgz"
   },
   "devDependencies": {
     "@types/axios": "^0.14.4",

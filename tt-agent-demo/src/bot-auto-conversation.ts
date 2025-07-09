@@ -1,4 +1,4 @@
 
-import Bot  from 'mozi-agent/Bot';
-const bot = new Bot("C:/Workspace/ai/mozi-agent/aiconfig.json");
-await bot.autoConversation();
+import Bot  from 'tt-agent/Bot';
+const bot = new Bot("C:/Workspace/ai/tt-agent/ttconfig.json");
+await bot.loopChat();
