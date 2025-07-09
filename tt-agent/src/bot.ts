@@ -10,7 +10,7 @@ export default class Bot {
     private aiConfigPath: string;
 
 
-    constructor(aiConfigPath: string = "aiconfig.json") {
+    constructor(aiConfigPath: string = "ttconfig.json") {
         this.aiConfigPath = aiConfigPath;
 
     }
@@ -122,7 +122,7 @@ export default class Bot {
         try {
 
             while (true) {
-                const prompt = await rl.question("mozi> ");
+                const prompt = await rl.question("tt> ");
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }

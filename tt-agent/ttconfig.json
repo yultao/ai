@@ -56,7 +56,7 @@
       "disabled": true,
       "command": "node",
       "args": [
-        "C:/Workspace/ai/slack-mcp-server/dist/index.js"
+        "C:/Workspace/ai/tt-slack-mcp-server/dist/index.js"
       ]
     },
     "file": {
@@ -65,7 +65,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:\\Workspace\\ai\\mozi-agent"
+        "C:\\Workspace\\ai\\tt-agent"
       ]
     }
   },

@@ -53,7 +53,7 @@ await bot.chat();
 
 ---
 
-### ⚙️ Example: `aiconfig.json`
+### ⚙️ Example: `ttconfig.json`
 
 Customize your agent with API provider info, model selection, and MCP integration:
 

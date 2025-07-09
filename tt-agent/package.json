@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "bin": {
-    "tt-ai-agent-cli": "dist/cli.js"
+    "tt": "dist/cli.js"
   },
   "exports": {
     "./Bot": "./dist/bot.js"
