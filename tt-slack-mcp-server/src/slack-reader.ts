@@ -95,7 +95,7 @@ export class SlackReader {
     try {
       const folder = process.env.CONTEXT_ROOT+"/slack/conversations/" + channelId + "-" + channelName;
       const existingMessages = await this.loadMessagesByTs(folder);
-      const messages: SlackMessage[] = await this.fetchChannelThreads(channelId, existingMessages);
+      const messages: SlackMessage[] = await this.fetchThreads(channelId, existingMessages);
       this.writeMessagesGroupedByDate(messages, folder);
       return messages;
     } catch (err) {
@@ -103,7 +103,7 @@ export class SlackReader {
     }
     return [];
   }
-  async loadMessagesByTs(
+  private async loadMessagesByTs(
     channelId: string
   ): Promise<Record<string, SlackMessage>> {
     const dir = path.join(channelId);
@@ -143,9 +143,10 @@ export class SlackReader {
     }
   }
 
-  private async fetchChannelThreads(channel: string, existingMessages: Record<string, SlackMessage>): Promise<SlackMessage[]> {
+  //message + replies
+  private async fetchThreads(channel: string, existingMessages: Record<string, SlackMessage>): Promise<SlackMessage[]> {
     // const result: SlackMessage[] = [];
-    const newMessages = (await this.fetchAllMessages(channel)).sort((a, b) => Number(a.ts) - Number(b.ts));
+    const newMessages = (await this.fetchMessages(channel)).sort((a, b) => Number(a.ts) - Number(b.ts));
     for (const msg of newMessages) {
       delete msg.blocks;
       delete msg.bot_profile;
@@ -188,7 +189,7 @@ export class SlackReader {
     return Math.floor(date.getTime() / 1000);   // 转换为秒级时间戳
   }
 
-  private async fetchAllMessages(channelId: string): Promise<SlackMessage[]> {
+  private async fetchMessages(channelId: string): Promise<SlackMessage[]> {
     const BATCH_SIZE = 200;
     const MAX_RECORDS = 1000;
     const OLDEST = this.getDaysAgo(100);

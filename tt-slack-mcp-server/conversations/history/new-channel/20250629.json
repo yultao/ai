@@ -1,0 +1,62 @@
+[
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751194879.671489",
+    "client_msg_id": "43acb95f-1fd1-42e2-b972-1485d6e714ce",
+    "text": "abc",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751194900.186399",
+    "client_msg_id": "9249fd93-9f59-4ac8-83d1-4f9c22daa25b",
+    "text": "hi <@U093KDK0PPW>",
+    "team": "T093KD42SLC"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093L55DMHS|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093L55DMHS|TTBot>",
+    "bot_id": "B093L55DMHS",
+    "type": "message",
+    "ts": "1751194979.246129"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093K4U4MAN|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093K4U4MAN|TTBot>",
+    "bot_id": "B093K4U4MAN",
+    "type": "message",
+    "ts": "1751196126.731479"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751196128.773919",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Got your message: \"added an integration to this channel: <https://tt-65c5765.slack.com/services/B093K4U4MAN|TTBot>\"",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751196162.541309",
+    "client_msg_id": "06090bac-ccb9-4f89-8476-a3245dfab5ff",
+    "text": "first msg after setting up ttbot",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751196163.896139",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Got your message: \"first msg after setting up ttbot\"",
+    "team": "T093KD42SLC"
+  }
+]

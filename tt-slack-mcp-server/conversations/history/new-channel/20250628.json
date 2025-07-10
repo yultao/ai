@@ -1,0 +1,114 @@
+[
+  {
+    "subtype": "channel_join",
+    "user": "U093KD43HHA",
+    "text": "<@U093KD43HHA> has joined the channel",
+    "type": "message",
+    "ts": "1751160575.460209"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093KDJV8BE|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093KDJV8BE|TTBot>",
+    "bot_id": "B093KDJV8BE",
+    "type": "message",
+    "ts": "1751161295.385389"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093XJ0JS2D|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093XJ0JS2D|TTBot>",
+    "bot_id": "B093XJ0JS2D",
+    "type": "message",
+    "ts": "1751161413.185099"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751164117.576959",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Hello, Slack! This is a message from my Slack app.",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751164190.816649",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Hello, Slack! This is a message from my Slack app.",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751164358.736939",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Hello, Slack! This is a message from my Slack app.",
+    "team": "T093KD42SLC"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093XKRAYQZ|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093XKRAYQZ|TTBot>",
+    "bot_id": "B093XKRAYQZ",
+    "type": "message",
+    "ts": "1751164867.428089"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751165117.040749",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Hello, Slack! This is a message from my Slack app.",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KDK0PPW",
+    "type": "message",
+    "ts": "1751165141.624289",
+    "bot_id": "B093KDK0JQ4",
+    "app_id": "A093XHS5ZGR",
+    "text": "Hello, Slack! This is a message from my Slack app.",
+    "team": "T093KD42SLC"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751165169.651969",
+    "client_msg_id": "60b5e98b-3908-409c-b2c3-32f2f92dc5f2",
+    "text": "<@U093KDK0PPW>",
+    "team": "T093KD42SLC"
+  },
+  {
+    "subtype": "channel_join",
+    "user": "U093KDK0PPW",
+    "text": "<@U093KDK0PPW> has joined the channel",
+    "inviter": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751165172.631159"
+  },
+  {
+    "user": "U093KD43HHA",
+    "type": "message",
+    "ts": "1751165403.189659",
+    "client_msg_id": "7270a3a3-ba9b-4d94-842b-ecc92210041a",
+    "text": "hi <@U093KD43HHA> I love you",
+    "team": "T093KD42SLC"
+  },
+  {
+    "subtype": "bot_add",
+    "text": "added an integration to this channel: <https://tt-65c5765.slack.com/services/B093BHEALAF|TTBot>",
+    "user": "U093KD43HHA",
+    "bot_link": "<https://tt-65c5765.slack.com/services/B093BHEALAF|TTBot>",
+    "bot_id": "B093BHEALAF",
+    "type": "message",
+    "ts": "1751165528.440889"
+  }
+]
