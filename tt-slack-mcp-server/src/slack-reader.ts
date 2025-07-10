@@ -1,19 +1,13 @@
 import Bolt from '@slack/bolt';
 import dotenv from 'dotenv';
 import { WebAPICallResult } from '@slack/web-api';
+import {SlackMessage, loadMessagesByTs} from './slack-common.js';
 
 import * as fs from 'fs';
 import * as path from 'path';
 dotenv.config();
 
 
-type SlackMessage = {
-  ts: string;
-  thread_ts?: string;
-  text: string;
-  [key: string]: any;
-  replies: SlackMessage[]
-};
 
 
 export class SlackReader {
@@ -94,7 +88,7 @@ export class SlackReader {
   private async fetchMessagesByChannel(channelId: string, channelName: string, userId: string): Promise<SlackMessage[]> {
     try {
       const folder = process.env.CONTEXT_ROOT+"/slack/conversations/" + channelId + "-" + channelName;
-      const existingMessages = await this.loadMessagesByTs(folder);
+      const existingMessages = await loadMessagesByTs(folder);
       const messages: SlackMessage[] = await this.fetchThreads(channelId, existingMessages);
       this.writeMessagesGroupedByDate(messages, folder);
       return messages;
@@ -103,46 +97,7 @@ export class SlackReader {
     }
     return [];
   }
-  private async loadMessagesByTs(
-    channelId: string
-  ): Promise<Record<string, SlackMessage>> {
-    const dir = path.join(channelId);
-    if (!fs.existsSync(dir)) {
-      return {};
-    }
-
-    const messages: Record<string, SlackMessage> = {};
-
-    try {
-
-      const files = await fs.promises.readdir(dir);
-
-      for (const file of files) {
-        const fullPath = path.join(dir, file);
-        try {
-          const content = await fs.promises.readFile(fullPath, 'utf-8');
-          const array: SlackMessage[] = JSON.parse(content);
-
-          for (const msg of array) {
-            if (msg.ts) {
-              messages[msg.ts] = msg;
-            }
-          }
-        } catch (err) {
-          console.warn(`⚠️ Failed to parse ${file}:`, err);
-        }
-      }
-      //console.warn(`⚠️ existing:`, JSON.stringify(messages));
-      return messages;
-    } catch (err) {
-      console.warn(`⚠️ err:`, JSON.stringify(err));
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-        return {};
-      }
-      throw err;
-    }
-  }
-
+  
   //message + replies
   private async fetchThreads(channel: string, existingMessages: Record<string, SlackMessage>): Promise<SlackMessage[]> {
     // const result: SlackMessage[] = [];

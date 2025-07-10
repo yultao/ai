@@ -1,41 +1,24 @@
 import fs from 'fs';
 import * as path from 'path';
-type SlackMessage = {
-  ts: string;
-  thread_ts?: string;
-  text: string;
-  [key: string]: any;
-  replies: SlackMessage[]
-};
+import { SlackMessage, loadMessagesByTs } from './slack-common.js';
+
 
 export class SlackDownloader {
 
   constructor() { }
-  /**
-   * Remove JSON content inside cached_latest_updates form-data
-   */
-  stripCachedLatestUpdatesBody(body: string): string {
-    return body.replace(
-      /(name=\\"cached_latest_updates\\"\\r\\n\\r\\n)\{[^}]*\}/,
-      '$1{}'
-    );
-  }
 
-  private deduplicateByTS(messages: SlackMessage[]): SlackMessage[] {
-    const seen = new Set<string>();
-    return messages.filter((msg) => {
-      if (seen.has(msg.ts)) {
-        return false;
-      }
-      seen.add(msg.ts);
-      return true;
-    });
-  }
+
 
   /**
    * Parse and execute fetch calls from the requests.txt file
    */
   async runRequestsFromFile(filePath: string) {
+    function stripCachedLatestUpdatesBody(body: string): string {
+      return body.replace(
+        /(name=\\"cached_latest_updates\\"\\r\\n\\r\\n)\{[^}]*\}/,
+        '$1{}'
+      );
+    }
     const raw = await fs.promises.readFile(filePath, 'utf-8');
 
     // Match each fetch(...) block
@@ -54,7 +37,7 @@ export class SlackDownloader {
         const bodyMatch = fetchCall.match(/"body":\s*?"([^]*?)",\s*"method":/);
         if (bodyMatch) {
           const originalBody = bodyMatch[1];
-          const cleanedBody = this.stripCachedLatestUpdatesBody(originalBody);
+          const cleanedBody = stripCachedLatestUpdatesBody(originalBody);
 
           // Replace in the fetch string
           const cleanedFetch = fetchCall.replace(originalBody, cleanedBody);
@@ -80,6 +63,79 @@ export class SlackDownloader {
         console.error('❌ Failed request:', err);
       }
     }
+    return allMessages;
+    // await fs.promises.writeFile(filePath + ".json", JSON.stringify(sortedMessages, null, 2), 'utf-8');
+  }
+
+  async postProcess(channelPath: string, allMessages: SlackMessage[]) {
+    function deduplicateByTS(messages: SlackMessage[]): SlackMessage[] {
+      const seen = new Set<string>();
+      return messages.filter((msg) => {
+        if (seen.has(msg.ts)) {
+          return false;
+        }
+        seen.add(msg.ts);
+        return true;
+      });
+    }
+
+    function deepMerge(obj1: SlackMessage, obj2: SlackMessage): SlackMessage {
+      const result: SlackMessage = { ...obj1 };
+
+      for (const key in obj2) {
+        const val1 = obj1[key];
+        const val2 = obj2[key];
+
+        if (Array.isArray(val1) && Array.isArray(val2)) {
+          if (key === 'replies') {
+            // 合并 replies，按 ts 去重
+            const oldMap = new Map<string, any>();
+            val1.forEach((item: any) => {
+              if (item.ts) oldMap.set(item.ts, { ...item });
+            });
+
+            const merged: any[] = [];
+
+            const seen = new Set<string>();
+            val2.forEach((item: any) => {
+              if (!item.ts) return;
+              const oldItem = oldMap.get(item.ts);
+              if (oldItem) {
+                merged.push({ ...item, updated: true });
+                oldMap.delete(item.ts); // 已处理，移除
+              } else {
+                merged.push(item); // 新增项
+              }
+              seen.add(item.ts);
+            });
+
+            // 剩下的是旧的，但没在新中出现 → 标记为 deleted
+            for (const [ts, oldItem] of oldMap.entries()) {
+              merged.push({ ...oldItem, deleted: true });
+            }
+
+            result[key] = merged;
+          } else {
+            result[key] = [...val1, ...val2];
+          }
+        } else if (
+          typeof val1 === 'object' &&
+          typeof val2 === 'object' &&
+          val1 !== null &&
+          val2 !== null &&
+          !Array.isArray(val1) &&
+          !Array.isArray(val2)
+        ) {
+          result[key] = deepMerge(val1, val2);
+        } else {
+          result[key] = val2;
+        }
+      }
+
+      return result;
+    }
+
+    channelPath = channelPath.replace("request", "history");
 
     //step 2: clean
     console.log('clean');
@@ -90,7 +146,8 @@ export class SlackDownloader {
 
     //step 3: uniqueMessages
     console.log('dedup');
-    const uniqueMessages = this.deduplicateByTS(allMessages);
+    const uniqueMessages = deduplicateByTS(allMessages);
+
 
     console.log('k-v');
     const messageMap: Record<string, SlackMessage> = {};
@@ -99,6 +156,7 @@ export class SlackDownloader {
         messageMap[msg.ts] = msg;
       }
     }
+
     console.log('restructure');
     const messagesWithReplies: SlackMessage[] = [];
     for (const msg of uniqueMessages) {
@@ -118,16 +176,34 @@ export class SlackDownloader {
       }
     }
 
+
+    const mergedMessages = [];
+
+    const existingMessages = await loadMessagesByTs(channelPath);
+    console.log("merge");
+    for (const msg of messagesWithReplies) {
+      if (msg.ts) {
+        const existing = existingMessages[msg.ts];
+        if (existing) {
+          // const merged = { ...existing, ...msg };
+          const merged = deepMerge(existing, msg);
+
+          mergedMessages.push(merged);
+        } else {
+          mergedMessages.push(msg);
+        }
+      }
+    }
+
     //step 4: sortedMessages
     console.log('sort');
-    const sortedMessages = messagesWithReplies.sort((a, b) => Number(a.ts) - Number(b.ts));
-    for (const msg of messagesWithReplies) {
+    const sortedMessages = mergedMessages.sort((a, b) => Number(a.ts) - Number(b.ts));
+    for (const msg of mergedMessages) {
       if (msg.replies) {
         msg.replies.sort((a, b) => Number(a.ts) - Number(b.ts))
       }
     }
     return sortedMessages;
-    // await fs.promises.writeFile(filePath + ".json", JSON.stringify(sortedMessages, null, 2), 'utf-8');
   }
 
   async writeFile(dir: string, messages: SlackMessage[]): Promise<void> {
@@ -171,8 +247,8 @@ export class SlackDownloader {
       } else if (entry.isFile()) {
         console.log(fullPath)
         const messages = await this.runRequestsFromFile(fullPath);
-
-        this.writeFile(dir, messages!);
+        const processedMessages = await this.postProcess(dir, messages!);
+        this.writeFile(dir, processedMessages);
       }
     }
 
@@ -182,4 +258,4 @@ export class SlackDownloader {
 
 const down = new SlackDownloader();
 // await down.runRequestsFromFile("conversations/request/all-tt/request.js");
-await down.readAllFilesRecursive("conversations/request");
+await down.readAllFilesRecursive("conversations/request/all-tt");

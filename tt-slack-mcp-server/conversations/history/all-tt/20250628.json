@@ -3,6 +3,7 @@
     "subtype": "channel_join",
     "user": "U093KD43HHA",
     "text": "<@U093KD43HHA> has joined the channel",
+    "ddd": "fdsaf",
     "type": "message",
     "ts": "1751160523.600679"
   }

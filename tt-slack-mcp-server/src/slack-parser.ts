@@ -1,11 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import {SlackMessage} from './slack-common.js';
 
-type SlackMessage = {
-  client_msg_id?: string;
-  ts: string;
-  [key: string]: any;
-};
 
 export class SlackConversationParser {
   private rootPath: string;
