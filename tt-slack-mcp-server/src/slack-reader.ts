@@ -39,32 +39,22 @@ export class SlackReader {
 
     console.log(`SlackReader initialized with token: ${this.token}, secret: ${this.signingSecret}`);
   }
+
   public async getMessages(): Promise<SlackMessageResult> {
     const results: Record<string, any> = {};
     const channelMap = this.getChannelMap() || await this.getJoinedChannelMap();
-    console.log('Joined channel names:', channelMap);
-
-    // const users = await this.app.client.users.list({});
-    // const george = users.members?.find(u => u.real_name === 'G T');
-
-    // if (!george?.id) {
-    //   throw new Error('User G T not found');
-    // }
-
-    // const userId = george.id;
-    // console.log(`G T's user ID: ${userId}`);
+    console.log('Got joined channel names:', channelMap);
 
     for (const [channelId, channelName] of Object.entries(channelMap)) {
-      const result = await this.fetchMessages(channelId, "userId");
+      const result = await this.fetchMessagesByChannel(channelId, channelName, "userId");
       results[`${channelName}(${channelId})`] = result;
-      break;
     }
 
     return {
       content: [
         {
           type: 'text',
-          text: `Slack conversations:\n${JSON.stringify(results, null, 2)}`,
+          text: JSON.stringify(results, null, 2)
         },
       ],
     };
@@ -98,22 +88,28 @@ export class SlackReader {
         }
       }
 
+      const outputPath = path.join('conversations', 'channels.json');
+      console.log(outputPath);
+      await fs.writeFile(outputPath, JSON.stringify(map, null, 2), 'utf-8');
+      console.log(`✅ Saved joined channels map to ${outputPath}`);
+
       return map;
     } catch (err) {
-      console.error('Failed to fetch joined channels:', err);
+      console.error('❌ Failed to fetch joined channels:', err);
       return {};
     }
   }
 
 
-  private async fetchMessages(channel: string, userId: string): Promise<string> {
+  private async fetchMessagesByChannel(channelId: string, channelName: string, userId: string): Promise<string> {
     try {
-      const existingMessages = await this.loadMessagesByTs("conversations/" + channel);
-      const messages: SlackMessage[] = await this.fetchChannelThreads(channel, existingMessages);
-      this.writeMessagesGroupedByDate(messages, "conversations/" + channel);
+      const folder = "conversations/" + channelId+"-"+ channelName;
+      const existingMessages = await this.loadMessagesByTs(folder);
+      const messages: SlackMessage[] = await this.fetchChannelThreads(channelId, existingMessages);
+      this.writeMessagesGroupedByDate(messages, folder);
       return JSON.stringify(messages);
     } catch (err) {
-      console.error('Error fetching messages for channel', channel, err);
+      console.error('Error fetching messages for channel', channelId, err);
     }
     return "";
   }
@@ -166,10 +162,10 @@ export class SlackReader {
       if (msg.thread_ts) {
         const old = existingMessages[msg.ts];
         //console.log("old " +JSON.stringify(old));
-        const needsUpdate =!old || old.reply_count !== msg.reply_count || old.latest_reply !== msg.latest_reply;
-        
+        const needsUpdate = !old || old.reply_count !== msg.reply_count || old.latest_reply !== msg.latest_reply;
+
         if (needsUpdate) {
-          console.log("Update " + msg.ts + " vs " + msg.thread_ts);
+          console.log("Update " + msg.ts + "/" + msg.thread_ts);
           const replies = await this.fetchReplies(channel, msg.thread_ts);
           // 删除 replies 中的 blocks 字段
           msg.replies = replies.slice(1).map(reply => {
@@ -186,17 +182,30 @@ export class SlackReader {
     console.log("fetchChannelThreads: " + JSON.stringify(newMessages));
     return newMessages;
   }
+/**
+ * 获取 N 天前的 UTC 零点时间戳（单位：秒）
+ * 用于 Slack conversations.history 的 oldest 参数
+ */
+private getDaysAgo(days: number): number {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);       // 设置为今天的 UTC 00:00
+  date.setUTCDate(date.getUTCDate() - days); // 回退 N 天
+  return Math.floor(date.getTime() / 1000);   // 转换为秒级时间戳
+}
 
-
-  private async fetchAllMessages(channel: string): Promise<SlackMessage[]> {
+  private async fetchAllMessages(channelId: string): Promise<SlackMessage[]> {
+    const BATCH_SIZE = 200;
+    const MAX_RECORDS = 1000;
+    const OLDEST = this.getDaysAgo(100);
     let allMessages: SlackMessage[] = [];
     let cursor: string | undefined = undefined;
 
     do {
       const result: WebAPICallResult = await this.app.client.conversations.history({
-        channel,
+        channel: channelId,
         cursor,
-        limit: 200,
+        oldest: OLDEST,
+        limit: BATCH_SIZE,
       });
 
       if (result.messages) {
@@ -204,7 +213,7 @@ export class SlackReader {
       }
 
       cursor = result.response_metadata?.next_cursor;
-    } while (cursor);
+    } while (cursor && allMessages.length < MAX_RECORDS);
 
     return allMessages;
   }

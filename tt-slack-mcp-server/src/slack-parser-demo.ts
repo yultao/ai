@@ -1,4 +1,4 @@
-import {SlackConversationParser} from "./slack-message-parser.js"
+import {SlackConversationParser} from "./slack-parser.js"
 
 
 const parser = new SlackConversationParser('./conversations/dirty', './conversations/clean');
