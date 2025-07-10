@@ -162,14 +162,15 @@ export class SlackDownloader {
     for (const msg of uniqueMessages) {
       if (msg.thread_ts && msg.thread_ts != msg.ts) {//replies
         const pa = messageMap[msg.thread_ts];
+        if(pa) {
+          if (!pa.replies) {
+            pa.replies = [];
+          };
 
-        if (!pa.replies) {
-          pa.replies = [];
-        };
-
-        //console.log("push rep "+msg.ts+", "+msg.thread_ts+": "+pa.ts+", "+pa.thread_ts+", "+pa.replies)
-
-        pa.replies.push(msg);
+          pa.replies.push(msg);
+        } else {
+          console.warn("Found an orphan "+msg.thread_ts);
+        }
       } else {
         //console.log("push top "+msg.ts+", "+msg.thread_ts)
         messagesWithReplies.push(msg);
