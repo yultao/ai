@@ -83,10 +83,9 @@ server.registerTool("read-slack-conversations",
     description: "Read Slack Converstaions History"
   },
   async (_input, context) => {
-   
-      const slackReader = new SlackReader();
-      const results = await slackReader.getMessages();
-      return ({
+    const slackReader = new SlackReader();
+    const results = await slackReader.getMessages();
+    return ({
       content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
     });
   }
@@ -98,7 +97,7 @@ server.registerTool("read-slack-conversations",
 //     description: "Read Slack Converstaions History"
 //   },
 //   async (_input, context) => {
-   
+
 //     const results: Record<string, string[]> = {};
 //     const channelMap = await getJoinedChannelMap();
 //     console.log('Joined channel names:', channelMap);
@@ -150,7 +149,7 @@ server.registerTool("read-slack-conversations",
 //   }
 // }
 
- async function getChannelName(channelId: string): Promise<string | null> {
+async function getChannelName(channelId: string): Promise<string | null> {
   try {
     const result = await app.client.conversations.info({
       channel: channelId,

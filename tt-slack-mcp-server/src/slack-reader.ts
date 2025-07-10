@@ -2,13 +2,11 @@ import Bolt from '@slack/bolt';
 import dotenv from 'dotenv';
 import { WebAPICallResult } from '@slack/web-api';
 
-import * as fs from 'fs/promises';
+import * as fs from 'fs';
 import * as path from 'path';
 dotenv.config();
 
-interface SlackMessageResult {
-  content: { type: string; text: string }[];
-}
+
 type SlackMessage = {
   ts: string;
   thread_ts?: string;
@@ -26,7 +24,7 @@ export class SlackReader {
   private readonly tenHoursAgo: number;
 
   constructor() {
-
+    
     this.token = process.env.SLACK_USER_TOKEN!;
     this.signingSecret = process.env.SLACK_USER_SIGNING_SECRET!;
     this.tenHoursAgo = Math.floor(Date.now() / 1000) - 10 * 60 * 60;
@@ -40,24 +38,16 @@ export class SlackReader {
     console.log(`SlackReader initialized with token: ${this.token}, secret: ${this.signingSecret}`);
   }
 
-  public async getMessages(): Promise<SlackMessageResult> {
+  public async getMessages(): Promise<Record<string, SlackMessage[]>> {
     const results: Record<string, any> = {};
     const channelMap = this.getChannelMap() || await this.getJoinedChannelMap();
     console.log('Got joined channel names:', channelMap);
 
     for (const [channelId, channelName] of Object.entries(channelMap)) {
-      const result = await this.fetchMessagesByChannel(channelId, channelName, "userId");
-      results[`${channelName}(${channelId})`] = result;
+      const messages = await this.fetchMessagesByChannel(channelId, channelName, "userId");
+      results[`${channelId}-${channelName}`] = messages;
     }
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(results, null, 2)
-        },
-      ],
-    };
+    return results;
   }
 
   private getChannelMap(): Record<string, string> | undefined {
@@ -88,10 +78,10 @@ export class SlackReader {
         }
       }
 
-      const outputPath = path.join('conversations', 'channels.json');
-      console.log(outputPath);
-      await fs.writeFile(outputPath, JSON.stringify(map, null, 2), 'utf-8');
-      console.log(`✅ Saved joined channels map to ${outputPath}`);
+      // const outputPath = path.join('conversations', 'channels.json');
+      // console.log(outputPath);
+      // await fs.promises.writeFile(outputPath, JSON.stringify(map, null, 2), 'utf-8');
+      // console.log(`✅ Saved joined channels map to ${outputPath}`);
 
       return map;
     } catch (err) {
@@ -101,31 +91,36 @@ export class SlackReader {
   }
 
 
-  private async fetchMessagesByChannel(channelId: string, channelName: string, userId: string): Promise<string> {
+  private async fetchMessagesByChannel(channelId: string, channelName: string, userId: string): Promise<SlackMessage[]> {
     try {
-      const folder = "conversations/" + channelId+"-"+ channelName;
+      const folder = process.env.CONTEXT_ROOT+"/slack/conversations/" + channelId + "-" + channelName;
       const existingMessages = await this.loadMessagesByTs(folder);
       const messages: SlackMessage[] = await this.fetchChannelThreads(channelId, existingMessages);
       this.writeMessagesGroupedByDate(messages, folder);
-      return JSON.stringify(messages);
+      return messages;
     } catch (err) {
       console.error('Error fetching messages for channel', channelId, err);
     }
-    return "";
+    return [];
   }
   async loadMessagesByTs(
     channelId: string
   ): Promise<Record<string, SlackMessage>> {
     const dir = path.join(channelId);
+    if (!fs.existsSync(dir)) {
+      return {};
+    }
+
     const messages: Record<string, SlackMessage> = {};
 
     try {
-      const files = await fs.readdir(dir);
+
+      const files = await fs.promises.readdir(dir);
 
       for (const file of files) {
         const fullPath = path.join(dir, file);
         try {
-          const content = await fs.readFile(fullPath, 'utf-8');
+          const content = await fs.promises.readFile(fullPath, 'utf-8');
           const array: SlackMessage[] = JSON.parse(content);
 
           for (const msg of array) {
@@ -182,16 +177,16 @@ export class SlackReader {
     console.log("fetchChannelThreads: " + JSON.stringify(newMessages));
     return newMessages;
   }
-/**
- * 获取 N 天前的 UTC 零点时间戳（单位：秒）
- * 用于 Slack conversations.history 的 oldest 参数
- */
-private getDaysAgo(days: number): number {
-  const date = new Date();
-  date.setUTCHours(0, 0, 0, 0);       // 设置为今天的 UTC 00:00
-  date.setUTCDate(date.getUTCDate() - days); // 回退 N 天
-  return Math.floor(date.getTime() / 1000);   // 转换为秒级时间戳
-}
+  /**
+   * 获取 N 天前的 UTC 零点时间戳（单位：秒）
+   * 用于 Slack conversations.history 的 oldest 参数
+   */
+  private getDaysAgo(days: number): number {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);       // 设置为今天的 UTC 00:00
+    date.setUTCDate(date.getUTCDate() - days); // 回退 N 天
+    return Math.floor(date.getTime() / 1000);   // 转换为秒级时间戳
+  }
 
   private async fetchAllMessages(channelId: string): Promise<SlackMessage[]> {
     const BATCH_SIZE = 200;
@@ -263,12 +258,12 @@ private getDaysAgo(days: number): number {
     }
 
     // 创建目录
-    await fs.mkdir(outputDir, { recursive: true });
+    await fs.promises.mkdir(outputDir, { recursive: true });
 
     // 写入文件
     for (const [date, msgs] of Object.entries(grouped)) {
       const filePath = path.join(outputDir, `${date}.json`);
-      await fs.writeFile(filePath, JSON.stringify(msgs, null, 2), 'utf-8');
+      await fs.promises.writeFile(filePath, JSON.stringify(msgs, null, 2), 'utf-8');
       console.log(`Wrote ${msgs.length} messages to ${filePath}`);
     }
   }
