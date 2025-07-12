@@ -45,7 +45,9 @@ app.post("/chat", async (req: any, res: any) => {
         // Push the full result into your cache
         // 将 assistant 的回答也加入历史记录
         chatHistory.push({ role: "assistant", content: fullResponse });
-
+        if(chatHistory.length>5) {
+            chatHistory.shift();
+        }
         res.write("data: [DONE]"+chatHistory.length+"\n\n");
         res.end();
     } catch (err) {
