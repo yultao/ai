@@ -100,63 +100,70 @@ function App() {
       </div>
 
 
-      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
-        <div
-          style={{
-            flex: 1,
-            backgroundColor: "#d2eafc", // 与用户消息统一
-            padding: "10px 14px",
-            borderRadius: "12px",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <textarea
-            rows={2}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.altKey) {
-                e.preventDefault();
-                handleSend();
-              }
-              if (e.key === 'Enter' && e.altKey) {
-                e.preventDefault();
-                setInput((prev) => prev + '\n');
-              }
-            }}
-            placeholder="Type your message..."
-            style={{
-              width: "100%",
-              border: "none",
-              outline: "none",
-              resize: "none",
-              background: "transparent",
-              fontSize: "14px",
-              fontFamily: "inherit",
-            }}
-          />
-        </div>
+      
 
-        <button
-          onClick={handleSend}
-          disabled={loading}
-          style={{
-            height: '40px',
-            minWidth: '60px',
-            padding: '0 16px',
-            background: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            transition: 'background 0.2s ease-in-out',
-          }}
-        >
-          {loading ? '...' : 'Send'}
-        </button>
-      </div>
+      <div style={{ marginTop: '10px', position: 'relative', display: 'flex', justifyContent: 'flex-end' }}>
+  <div
+    style={{
+      flex: 1,
+      backgroundColor: "#d2eafc",
+      padding: "10px 14px",
+      borderRadius: "12px",
+      position: "relative",
+    }}
+  >
+    <textarea
+      rows={2}
+      value={input}
+      onChange={(e) => setInput(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.altKey) {
+          e.preventDefault();
+          handleSend();
+        }
+        if (e.key === 'Enter' && e.altKey) {
+          e.preventDefault();
+          setInput((prev) => prev + '\n');
+        }
+      }}
+      placeholder="Type your message..."
+      style={{
+        width: "100%",
+        border: "none",
+        outline: "none",
+        resize: "none",
+        background: "transparent",
+        fontSize: "14px",
+        fontFamily: "inherit",
+        paddingRight: "60px", // 给按钮留空间
+        boxSizing: "border-box",
+      }}
+    />
+
+    {/* 按钮嵌在右下角 */}
+    <button
+      onClick={handleSend}
+      disabled={loading}
+      style={{
+        position: 'absolute',
+        bottom: '10px',
+        right: '10px',
+        height: '30px',
+        padding: '0 12px',
+        background: '#007bff',
+        color: 'white',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '14px',
+      }}
+    >
+      {loading ? '...' : 'Send'}
+    </button>
+  </div>
+</div>
+
+ {/* 发送 */}
     </div>
   );
 }
