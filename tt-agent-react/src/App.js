@@ -99,41 +99,59 @@ function App() {
         <div ref={bottomRef} /> {/* 👈 用于滚动到底部 */}
       </div>
 
-      <div style={{ position: 'relative', width: '100%' }}>
-        <textarea
-          rows={4}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.altKey) {
-              e.preventDefault();
-              handleSend();
-            }
-            if (e.key === 'Enter' && e.altKey) {
-              e.preventDefault();
-              setInput((prev) => prev + '\n');
-            }
-          }}
+
+      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+        <div
           style={{
-            width: '100%',
-            resize: 'none',
-            marginBottom: '10px',
+            flex: 1,
+            backgroundColor: "#d2eafc", // 与用户消息统一
+            padding: "10px 14px",
+            borderRadius: "12px",
+            display: "flex",
+            flexDirection: "column",
           }}
-        />
+        >
+          <textarea
+            rows={2}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.altKey) {
+                e.preventDefault();
+                handleSend();
+              }
+              if (e.key === 'Enter' && e.altKey) {
+                e.preventDefault();
+                setInput((prev) => prev + '\n');
+              }
+            }}
+            placeholder="Type your message..."
+            style={{
+              width: "100%",
+              border: "none",
+              outline: "none",
+              resize: "none",
+              background: "transparent",
+              fontSize: "14px",
+              fontFamily: "inherit",
+            }}
+          />
+        </div>
+
         <button
           onClick={handleSend}
           disabled={loading}
           style={{
-            position: 'absolute',
-            right: '10px',
-            bottom: '16px',
-            height: '30px',
-            padding: '0 12px',
+            height: '40px',
+            minWidth: '60px',
+            padding: '0 16px',
             background: '#007bff',
             color: 'white',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '20px',
             cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: 'background 0.2s ease-in-out',
           }}
         >
           {loading ? '...' : 'Send'}
