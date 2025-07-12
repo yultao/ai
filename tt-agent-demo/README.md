@@ -115,3 +115,7 @@ https://tt-65c5765.slack.com/api/conversations.view?_x_id=noversion-1751973682.3
 https://tt-65c5765.slack.com/api/conversations.replies?_x_id=1af3ac8b-1751974139.028&_x_csid=6w8Ej8qg9ds&slack_route=T093KD42SLC&_x_version_ts=1751968952&_x_frontend_build_type=current&_x_desktop_ia=4&_x_gantry=true&fp=f5&_x_num_retries=0
 
 https://tt-65c5765.slack.com/api/conversations.replies?_x_id=1af3ac8b-1751974139.349&_x_csid=6w8Ej8qg9ds&slack_route=T093KD42SLC&_x_version_ts=1751968952&_x_frontend_build_type=current&_x_desktop_ia=4&_x_gantry=true&fp=f5&_x_num_retries=0
+
+
+npm install electron --save-dev
+npm install --save-dev typescript @types/node @types/electron
