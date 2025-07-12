@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // <-- useRef & useEffect
 import ReactMarkdown from "react-markdown";
 
 function App() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-  // const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null); // 👈 用于滚动到底部
+
+  // 自动滚动到底部
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSend = async () => {
     setLoading(true);
     setMessages((prev) => [...prev, { role: "user", content: input }]);
-    setInput(''); // ⬅️ 发送后清空输入框
+    setInput('');
 
     let fullResponse = "";
-
 
     const res = await fetch('http://localhost:3001/chat', {
       method: 'POST',
@@ -44,7 +48,7 @@ function App() {
             ) {
               updated.push({ role: "assistant", content: fullResponse });
             } else {
-              updated[updated.length - 1].content = fullResponse; // ⬅️ 覆盖，不再追加
+              updated[updated.length - 1].content = fullResponse;
             }
             return updated;
           });
@@ -92,7 +96,9 @@ function App() {
             </div>
           </div>
         ))}
+        <div ref={bottomRef} /> {/* 👈 用于滚动到底部 */}
       </div>
+
       <div style={{ position: 'relative', width: '100%' }}>
         <textarea
           rows={4}
