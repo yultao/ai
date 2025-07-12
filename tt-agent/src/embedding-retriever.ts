@@ -1,4 +1,4 @@
-import VectorStore from "./vector-store.js";
+import VectorStore from "./knowlegebase/vector-store.js";
 import OpenAI from 'openai';
 import { pipeline } from '@xenova/transformers';
 import { logInfo } from "./logger.js";
@@ -39,8 +39,7 @@ export default class EmbeddingRetriever {
         return oneDArray;
     }
 
-    async retrieve(query: string, topk: number = 3) {
-        const queryEmbedding = await this.embedQuery(query);
+    async retrieve(queryEmbedding: number[], topk: number = 3) {
         return this.vectorStore.search(queryEmbedding, topk);
     }
 }

@@ -1,17 +1,28 @@
-import EmbeddingRetriever from "./embedding-retriever.js";
+import EmbeddingRetriever from "../embedding-retriever.js";
 import * as fs from 'fs/promises';
 import * as path from "path";
-import { logInfo, logTitle } from "./logger.js";
+import { logInfo, logTitle } from "../logger.js";
 
 export default class KnowledgeContext {
     private model: string
     private knowledgeDir: string;
+
+    private er: EmbeddingRetriever;
     constructor(model: string, knowledgeDir: string) {
         this.model = model;
         this.knowledgeDir = knowledgeDir;
+        this.er = new EmbeddingRetriever(this.model);
+        this.embedKnowledgeBase();//初始化向量数据库
     }
 
+    private async embedKnowledgeBase() {
+        const files = await this.readAllFilesRecursive(this.knowledgeDir);
 
+        for (const file of files) {
+            const document = await fs.readFile(file, 'utf-8');
+            await this.er.embedDocument(document);
+        }
+    }
 
     async retrieveContext(prompt?: string) {
 
@@ -50,15 +61,8 @@ export default class KnowledgeContext {
     }
 
     private async retrieveSpecificContext(prompt: string) {
-        const emb = new EmbeddingRetriever(this.model);
-        const files = await this.readAllFilesRecursive(this.knowledgeDir);
-
-        for (const file of files) {
-            const document = await fs.readFile(file, 'utf-8');
-            await emb.embedDocument(document);
-        }
-
-        const context = await emb.retrieve(prompt);
+        const queryEmbedding = await this.er.embedQuery(prompt);
+        const context = await this.er.retrieve(queryEmbedding);
         logTitle("CONTEXT");
         console.log(context);
         return context.map(item => item.document).join("\n");

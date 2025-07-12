@@ -105,8 +105,8 @@ export default class OpenAIClient {
                         // logInfo(`currentToolCall: ${JSON.stringify(currentToolCall)}`);
                         // logInfo(`toolCallsMap: ${[...toolCallsMap.entries()]}`);
                     }// end for each tool call
-                }
-            }
+                }//handle tools
+            }//handle stream end
             process.stdout.write("\n");
             logTitle("END");
 

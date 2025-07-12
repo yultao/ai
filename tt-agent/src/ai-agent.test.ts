@@ -1,6 +1,6 @@
-import MCPClient from './mcp-client.js';
+
 import MyAgent from './ai-agent.js';
-import AiConfig from './config.js';
+import AiConfig from './ttconfig.js';
 
 import KnowledgeContext from './knowledge-context.js';
 import { logInfo, logTitle } from "./logger.js";

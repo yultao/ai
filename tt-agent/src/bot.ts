@@ -2,7 +2,7 @@
 // import MCPClient from './mcp-client.js';
 import MyAgent from './ai-agent.js';
 import { logInfo, logError } from "./logger.js";
-import AiConfig from './config.js';
+import AiConfig from './ttconfig.js';
 import { createInterface } from "readline/promises";
 import KnowledgeContext from './knowledge-context.js';
 import dotenv from 'dotenv';
