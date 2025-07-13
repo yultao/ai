@@ -3,7 +3,7 @@ import Bot from './bot.js';
 async function askSingleQuestion() {
     const bot = new Bot();
     // const res = await bot.askSingleQuestion('Who is Leopoldo Corkery?');
-    const res = await bot.askSingleQuestion('Summarize what happened on 20250706');
+    const res = await bot.askSingleQuestion('get my slack msgs');
    
 }
 
@@ -22,7 +22,7 @@ async function loopChat() {
 }
 // await askSingleQuestion();
 // await conversation();
-await loopChat();
+await askSingleQuestion();
 
 // test('ask and answer', () => {
 //     expect(tt()).toBe(3);

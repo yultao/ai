@@ -1,7 +1,7 @@
 {
   "apiProvider": {
     "apiKey": "sk-this-will-be-replaced-by-env",
-    "apiBaseURL": "https://api.groq.com/openai/v1"
+    "apiBaseURL": "https://openrouter.ai/api/v1"
   },
   "apiProviders": {
     "openrouter": {
@@ -13,7 +13,7 @@
       "apiBaseURL": "https://api.groq.com/openai/v1"
     }
   },
-  "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+  "model": "deepseek/deepseek-chat-v3-0324:free",
   "models": {
     "deepseek/deepseek-chat-v3-0324:free": {
       "name": "DeepSeek Chat V3",
@@ -53,10 +53,10 @@
       ]
     },
     "slack-mcp": {
-      "disabled": true,
+      "disabled": false,
       "command": "node",
       "args": [
-        "C:/Workspace/ai/tt-slack-mcp-server/dist/index.js"
+        "C:/Workspace/ai/slack-mcp-server/dist/index.js"
       ]
     },
     "file": {
@@ -65,7 +65,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:\\Workspace\\ai\\tt-agent"
+        "C:\\Workspace\\ai\\taobot"
       ]
     }
   },

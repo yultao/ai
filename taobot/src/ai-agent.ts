@@ -50,10 +50,10 @@ export default class MyAgent {
         if (!this.openAIClient) {
             throw new Error("OpenAI client is not initialized.");
         }
-
+        let res = "";
         let response = await this.openAIClient!.chat(prompt);
         while (true) {
-
+            //如果工具调用，调用工具
             if (response.toolCalls.length > 0) {
                 // 如果有工具调用，处理每个工具调用
                 for (const toolCall of response.toolCalls) {
@@ -76,13 +76,15 @@ export default class MyAgent {
 
                     }
                 }
-                // After processing tool calls, continue to get the next response
+                // 工具调用之后，发送空请求？
                 response = await this.openAIClient.chat();
-                continue; // Continue to process the next response
+                // continue; // Continue to process the next response
+            } else {
+                res = response.content;//如果没有工具调用，返回内容
+                break;
             }
-            //如果没有工具调用，返回内容
-            return response.content;
         }
+        return res;
     }
 
 
