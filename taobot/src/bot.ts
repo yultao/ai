@@ -73,7 +73,7 @@ export default class Bot {
     /*
     scenario 1: single question, based on a specific knowledge context
     */
-    public async askSingleQuestion(prompt: string, knowledgeDir?:string) {
+    public async query(prompt: string, knowledgeDir?:string) {
         const myAgent = await this.createAgent(knowledgeDir, prompt);
         let response
         try {
@@ -87,21 +87,19 @@ export default class Bot {
         return response;
     }
 
-        /*
-    scenario 1: single question, based on a specific knowledge context
-    */
-    public async streamQuery(prompt: string, knowledgeDir?:string) {
+
+    public async *streamQuery(prompt: string, knowledgeDir?:string): AsyncGenerator<string, void, unknown> {
         const myAgent = await this.createAgent(knowledgeDir, prompt);
-        let response
-        try {
-            response = await myAgent.stream(prompt);
-            // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
+         try {
+            const chatStream = await myAgent.stream(prompt);
+            for await (const chunk of chatStream) {
+                yield chunk;
+            }
         } catch (error) {
-            logError(`Error invoking agent: ${error}`);
+            logError(`Error stream: ${error}`);
         } finally {
             await myAgent.close();
         }
-        return response;
     }
     
 
@@ -130,7 +128,7 @@ export default class Bot {
     /**
      * scenario 3: self-loop conversation, based on a full knowledge context
      */
-    public async loopChat(knowledgeDir?:string) {
+    public async chat(knowledgeDir?:string) {
         const rl = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -139,7 +137,7 @@ export default class Bot {
         try {
 
             while (true) {
-                const prompt = await rl.question("tt> ");
+                const prompt = await rl.question("taobot> ");
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }
@@ -152,4 +150,33 @@ export default class Bot {
             rl.close();
         }
     }
+
+
+    
+    public async *streamChat(knowledgeDir?:string): AsyncGenerator<string, void, unknown> {
+        const rl = createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        const myAgent = await this.createAgent(knowledgeDir);
+        try {
+
+            while (true) {
+                const prompt = await rl.question("taobot> ");
+                if (prompt.trim().toLowerCase() === "exit") {
+                    break;
+                }
+                const chatStream = myAgent.stream(prompt);
+                for await (const chunk of chatStream) {
+                    yield chunk;
+                }
+            }
+        } catch (error) {
+            logError(`Error invoking agent: ${error}`);
+        } finally {
+            await myAgent.close();
+            rl.close();
+        }
+    }
+    
 }

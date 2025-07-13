@@ -15,7 +15,8 @@ async function testAgent() {
     // const prompt = "请抓取https://jsonplaceholder.typicode.com/users的内容，并在knowledge目录中为每个人创建一个md文件，保存基本信息，文件名以人名字命名，空格以-替代。";
     // const prompt = "根据Delphine的基本信息，写一个关于他的BIO，并保存到bio目录，以人名字命名的md文件。";
     // const prompt = "Based on Delphine's basic information, write a BIO about him and save it to the bio directory as an md file named after the person.";
-    const prompt = "get my slack messages";
+    // const prompt = "get my slack messages";
+    const prompt = "Give me a brief introduction to Ottawa";
     // Initialize MCP clients
     // const mcpClients = [
     //     new MCPClient('fetch-client', `uvx`, ['mcp-server-fetch']),

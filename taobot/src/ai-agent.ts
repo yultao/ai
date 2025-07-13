@@ -14,7 +14,6 @@ export default class MyAgent {
     private context: string;
     constructor(
         mcpServers: ServerEntry[],
-        // mcpClients: MCPClient[] = [],
         apiKey: string,
         apiBaseURL: string,
         model: string,
@@ -40,7 +39,6 @@ export default class MyAgent {
 
         // Collect tools from all MCP clients
         const tools = this.mcpClients.flatMap(client => client.getTools());
-        //logInfo(`Collected ${tools.length} tools from MCP clients.`);
         // Initialize OpenAI client with the provided model, system prompt, tools, and context
         this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
 
@@ -53,7 +51,7 @@ export default class MyAgent {
         let res = "";
         let response = await this.openAIClient!.invoke(prompt);
         while (true) {
-            console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
+            // console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
 
             //如果工具调用，调用工具
             if (response.toolCalls.length > 0) {
@@ -105,11 +103,6 @@ export default class MyAgent {
                 const toolId = toolCallMatch[1].trim();    // call_haXqUuVbTtCqOOig3gQABQ
                 const toolName = toolCallMatch[2].trim();  // read-slack-conversations
                 const toolArgs = toolCallMatch[3].trim();  // {}
-                //logInfo("正在调用工具: " + toolName);
-
-                // 给用户提示正在调用工具
-
-
                 // 假设你有一个调用工具的函数，且支持流式返回结果
                 const toolStream = this.callTool(toolId, toolName, toolArgs);
 
@@ -121,7 +114,6 @@ export default class MyAgent {
                 // 工具调用结束后，继续接收openaiClient输出
                 // openaiStream = this.openAIClient.stream("");
             } else {
-                logInfo("普通文本直接返回: " + chunk);
                 // 普通文本直接返回
                 yield chunk;
             }
@@ -134,7 +126,6 @@ export default class MyAgent {
             throw new Error("OpenAI client is not initialized.");
         }
         // 这里举个例子，真实调用根据你工具接口改写
-        //yield `开始执行工具 ${name}\n`;
         yield `[Agent] 正在调用工具 ${id}: ${name}，参数: ${args} ...\n`;
         const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === name));
         if (mcpClient) {
@@ -143,7 +134,7 @@ export default class MyAgent {
 
             const result = await mcpClient.callTool(name, JSON.parse(args));
             // logInfo(`Executed  ${mcpClient.getName()} tool ${name} with result: ${JSON.stringify(result)}`);
-            yield result.content;
+            yield JSON.stringify(result);
             this.openAIClient.appendToolResult(id, JSON.stringify(result));
 
         } else {
@@ -151,13 +142,8 @@ export default class MyAgent {
             this.openAIClient.appendToolResult(id, "No MCP client found for this tool.");
 
         }
-        // 模拟工具返回多次输出
-        // for (let i = 0; i < 3; i++) {
-        //     yield `工具输出第${i + 1}条，参数是: ${args}\n`;
-        //     await new Promise(r => setTimeout(r, 500)); // 模拟异步延时
-        // }
 
-        yield `\n工具 ${name} 执行完毕。\n`;
+        yield `\n工具 ${name} 执行完毕。`;
     }
 
     public async close() {

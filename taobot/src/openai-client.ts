@@ -13,6 +13,7 @@ export default class OpenAIClient {
     private openai: OpenAI;
     private model: string;
     private tools: Tool[];
+    private availableTools: [];
     // Array to hold chat messages
     private messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 
@@ -26,22 +27,15 @@ export default class OpenAIClient {
         this.tools = tools;
         if (systemPrompt) this.appendMessages({ role: 'system', content: systemPrompt });
         if (context) this.appendMessages({ role: 'user', content: context });
+        this.availableTools = this.getOpenAITools();
     }
-
-    private appendMessages(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
-        this.messages.push(message);           // Add to end
-        if (this.messages.length > 100000) {
-            this.messages.shift();            // Remove from front if over limit
-        }
-    }
-
 
     async invoke(prompt?: string) {
         logInfo(`this.message.length: ${this.messages.length}`);
 
 
         let content = '';
-        const toolCallsMap = new Map<string, ToolCall>();
+        const suggestedToolCalls = new Map<string, ToolCall>();
         try {
             logTitle("REQUEST");
             if (prompt) {
@@ -55,7 +49,7 @@ export default class OpenAIClient {
                 model: this.model,
                 messages: this.messages,
                 stream: true,
-                tools: this.getOpenAITools(),//tell openai the available tools
+                tools: this.availableTools,//tell openai the available tools
 
             });
 
@@ -63,7 +57,6 @@ export default class OpenAIClient {
             logTitle("RESPONSE");
 
             for await (const part of stream) {
-                // logInfo(`Part: ${JSON.stringify(part)}`);
                 if (part.choices[0].delta.content) {
                     content += part.choices[0].delta.content;
                     process.stdout.write(part.choices[0].delta.content);
@@ -71,24 +64,20 @@ export default class OpenAIClient {
 
 
                 if (part.choices[0].delta.tool_calls) {
-                    // console.log(3);
                     for (const toolCall of part.choices[0].delta.tool_calls) {
-                        // logInfo(`toolCall: ${JSON.stringify(toolCall)}`);
 
                         const key = toolCall.index.toString();
-                        // console.log(5 + " key: " +key+": "+(!toolCallsMap.has(key)));
-                        if (!toolCallsMap.has(key)) {
-                            toolCallsMap.set(key, {
+                        if (!suggestedToolCalls.has(key)) {
+                            suggestedToolCalls.set(key, {
                                 id: '',
                                 function: {
                                     name: '',
                                     arguments: '',
                                 },
                             });
-                            // logInfo(`toolCallsMap1: ${[...toolCallsMap.entries()]}`);
                         }
 
-                        const currentToolCall = toolCallsMap.get(key);
+                        const currentToolCall = suggestedToolCalls.get(key);
 
                         //merge the current tool call
                         if (toolCall.id) {
@@ -102,8 +91,6 @@ export default class OpenAIClient {
                                 currentToolCall!.function.arguments += toolCall.function.arguments;
                             }
                         }
-                        // logInfo(`currentToolCall: ${JSON.stringify(currentToolCall)}`);
-                        // logInfo(`toolCallsMap: ${[...toolCallsMap.entries()]}`);
                     }// end for each tool call
                 }//handle tools
             }//handle stream end
@@ -115,7 +102,7 @@ export default class OpenAIClient {
         }
 
         //suggested tools by openai
-        let toolCalls: ToolCall[] = Array.from(toolCallsMap.values());
+        let toolCalls: ToolCall[] = Array.from(suggestedToolCalls.values());
         // push the final message to the messages array
         this.appendMessages({
             role: 'assistant',
@@ -134,7 +121,7 @@ export default class OpenAIClient {
     }
 
     public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
-        logTitle("REQUEST");
+        logTitle("REQUEST STREAM");
         if (prompt) {
             logGreenInfo(prompt);
             this.appendMessages({ role: 'user', content: prompt });
@@ -149,10 +136,10 @@ export default class OpenAIClient {
             model: this.model,
             messages: this.messages,
             stream: true,
-            tools: this.getOpenAITools(),
+            tools: this.availableTools,
         });
         
-        logTitle("RESPONSE");
+        logTitle("RESPONSE STREAM");
         for await (const part of stream) {
             const delta = part.choices[0].delta;
 
@@ -191,7 +178,8 @@ export default class OpenAIClient {
                 }
             }
         }
-        logTitle("END");
+        yield "\n";
+        logTitle("END STREAM");
 
         // 最终合并调用历史
         const toolCalls = Array.from(toolCallsMap.values());
@@ -221,6 +209,15 @@ export default class OpenAIClient {
         // logInfo(`OpenAI Tools: ${JSON.stringify(openapiTools)}`);
         return openapiTools;
     }
+
+
+    private appendMessages(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
+        this.messages.push(message);           // Add to end
+        if (this.messages.length > 100000) {
+            this.messages.shift();            // Remove from front if over limit
+        }
+    }
+
 
     public appendToolResult(toolCallId: string, toolOutput: string): void {
         this.appendMessages({

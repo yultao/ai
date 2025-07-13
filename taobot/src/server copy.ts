@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
 import dotenv from 'dotenv';
-import Bot from './bot.js';
+
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -16,7 +16,6 @@ const openai = new OpenAI({
 const chatHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: "system", content: "You are a helpful assistant." }
 ];
-const bot = new Bot();
 app.post("/chat", async (req: any, res: any) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -28,16 +27,18 @@ app.post("/chat", async (req: any, res: any) => {
         // 先将用户的问题加入历史记录
         chatHistory.push({ role: "user", content: userMessage });
 
-        const chatStream = await bot.streamQuery(userMessage);
-
-
+        const chatStream = await openai.chat.completions.create({
+            model: "deepseek/deepseek-chat-v3-0324:free",
+            stream: true,
+            messages:chatHistory,
+        });
         let fullResponse = "";
 
         for await (const chunk of chatStream) {
-            if (chunk) {
-                fullResponse += chunk;
-                console.log(`data: ${chunk}\n\n`);
-                res.write(`data: ${chunk}\n\n`);
+            const content = chunk.choices[0]?.delta?.content;
+            if (content) {
+                fullResponse += content;
+                res.write(`data: ${content}\n\n`);
             }
         }
 
