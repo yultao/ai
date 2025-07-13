@@ -80,7 +80,7 @@ export default class Bot {
             response = await myAgent.invoke(prompt);
             // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
         } catch (error) {
-            logError(`Error invoking agent: ${error}`);
+            logError(`Error query: ${error}`);
         } finally {
             await myAgent.close();
         }
@@ -160,13 +160,12 @@ export default class Bot {
                 await myAgent.invoke(prompt);
             }
         } catch (error) {
-            logError(`Error invoking agent: ${error}`);
+            logError(`Error chat: ${error}`);
         } finally {
             await myAgent.close();
             rl.close();
         }
     }
-
 
 
     public async *streamChat(knowledgeDir?: string): AsyncGenerator<string, void, unknown> {
@@ -188,7 +187,7 @@ export default class Bot {
                 }
             }
         } catch (error) {
-            logError(`Error invoking agent: ${error}`);
+            logError(`Error streamChat: ${error}`);
         } finally {
             await myAgent.close();
             rl.close();

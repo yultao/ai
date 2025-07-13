@@ -98,7 +98,7 @@ export default class OpenAIClient {
             logTitle("END");
 
         } catch (err) {
-            logWarn(`Warn invoking chat: ${err}`);
+            logWarn(`Warn chat: ${err}`);
         }
 
         //suggested tools by openai
@@ -131,56 +131,59 @@ export default class OpenAIClient {
 
         const toolCallsMap = new Map<string, ToolCall>();
         let accumulated = "";
+        try {
+            const stream = await this.openai.chat.completions.create({
+                model: this.model,
+                messages: this.messages,
+                stream: true,
+                tools: this.availableTools,
+            });
 
-        const stream = await this.openai.chat.completions.create({
-            model: this.model,
-            messages: this.messages,
-            stream: true,
-            tools: this.availableTools,
-        });
-        
-        logTitle("RESPONSE STREAM");
-        for await (const part of stream) {
-            const delta = part.choices[0].delta;
+            logTitle("RESPONSE STREAM");
+            for await (const part of stream) {
+                const delta = part.choices[0].delta;
 
-            // 普通内容
-            if (delta?.content) {
-                accumulated += delta.content;
-                yield delta.content;
-            }
+                // 普通内容
+                if (delta?.content) {
+                    accumulated += delta.content;
+                    yield delta.content;
+                }
 
-            // 工具调用内容
-            if (delta.tool_calls) {
-                for (const toolCall of delta.tool_calls) {
-                    const key = toolCall.index.toString();
+                // 工具调用内容
+                if (delta.tool_calls) {
+                    for (const toolCall of delta.tool_calls) {
+                        const key = toolCall.index.toString();
 
-                    if (!toolCallsMap.has(key)) {
-                        toolCallsMap.set(key, {
-                            id: '',
-                            function: { name: '', arguments: '' },
-                        });
-                    }
+                        if (!toolCallsMap.has(key)) {
+                            toolCallsMap.set(key, {
+                                id: '',
+                                function: { name: '', arguments: '' },
+                            });
+                        }
 
-                    const current = toolCallsMap.get(key)!;
+                        const current = toolCallsMap.get(key)!;
 
-                    if (toolCall.id) current.id += toolCall.id;
-                    if (toolCall.function?.name) current.function.name += toolCall.function.name;
-                    if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
+                        if (toolCall.id) current.id += toolCall.id;
+                        if (toolCall.function?.name) current.function.name += toolCall.function.name;
+                        if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
 
-                    // 实时输出工具调用（拼接完成的部分也可以直接显示）
-                    const toolId = current.id;
-                    const toolName = current.function.name;
-                    const args = current.function.arguments;
+                        // 实时输出工具调用（拼接完成的部分也可以直接显示）
+                        const toolId = current.id;
+                        const toolName = current.function.name;
+                        const args = current.function.arguments;
 
-                    if (toolName && args) {
-                        yield `[TOOL_CALL]: ${toolId}: ${toolName}(${args})`;
+                        if (toolName && args) {
+                            yield `[TOOL_CALL]: ${toolId}: ${toolName}(${args})`;
+                        }
                     }
                 }
             }
-        }
-        yield "\n";
-        logTitle("END STREAM");
 
+            yield "\n";
+            logTitle("END STREAM");
+        } catch (err) {
+            logWarn(`Warn streamChat: ${err}`);
+        }
         // 最终合并调用历史
         const toolCalls = Array.from(toolCallsMap.values());
         this.appendMessages({

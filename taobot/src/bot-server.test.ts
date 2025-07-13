@@ -34,7 +34,7 @@ app.post("/chat/:chatId", async (req: any, res: any) => {
             conversations[chatId] = [
                 { role: "system", content: "You are a helpful assistant." }
             ];
-            bot.startConversation(chatId);
+            bot.startConversation(chatId);//开启一个新的对话
         }
         const chatHistory = conversations[chatId];
 
@@ -44,6 +44,7 @@ app.post("/chat/:chatId", async (req: any, res: any) => {
 
 
         let fullResponse = "";
+        res.write("data: "+ chatId + ":" + chatHistory.length + ": \n\n");
 
         for await (const chunk of chatStream) {
             fullResponse += chunk;
@@ -57,7 +58,7 @@ app.post("/chat/:chatId", async (req: any, res: any) => {
         if (chatHistory.length > 5) {
             chatHistory.shift();
         }
-        res.write("data: [DONE]" + chatId + ":" + chatHistory.length + "\n\n");
+        res.write("data: [DONE]\n\n");
         res.end();
     } catch (err) {
         console.error("OpenAI error:", err);
