@@ -1,6 +1,6 @@
 
 import MyAgent from './ai-agent.js';
-import AiConfig from './ttconfig.js';
+import AiConfig from './config.js';
 
 import KnowledgeContext from './knowledge-context.js';
 import { logInfo, logTitle } from "./logger.js";

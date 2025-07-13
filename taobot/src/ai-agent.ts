@@ -2,7 +2,7 @@ import { logError, logInfo, logTitle } from "./logger.js";
 import MCPClient from "./mcp-client.js";
 import OpenAIClient from "./openai-client.js";
 
-import {ServerEntry} from "./ttconfig.js";
+import {ServerEntry} from "./config.js";
 export default class MyAgent {
     private mcpServers: ServerEntry[];
     private mcpClients: MCPClient[] = [];
