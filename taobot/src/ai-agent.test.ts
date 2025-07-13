@@ -28,14 +28,14 @@ async function testAgent() {
     // const mcpClients = mcpServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
 
     dotenv.config();
-    const apiProviderConfig = aiConfig.getApiProviderConfig();
+    const { name: providerName, config: apiProviderConfig } = aiConfig.getEnabledApiProvider();
 
     const providerApiKey = process.env.OPENAI_API_KEY || apiProviderConfig.apiKey;
     const providerApiBaseURL = apiProviderConfig.apiBaseURL;;
     logInfo(`Using API Key: ${providerApiKey}`);
     logInfo(`Using API Base URL: ${providerApiBaseURL}`);
 
-    const model = aiConfig.getModelConfig();
+    const { name: model, config: modelConfig } = aiConfig.getEnabledModel();
     logInfo(`Using model: ${model}`);
 
     const systemPrompt = "You are a helpful assistant.";

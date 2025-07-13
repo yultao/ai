@@ -1,24 +1,26 @@
 {
-  "apiProvider": {
-    "apiKey": "sk-this-will-be-replaced-by-env",
-    "apiBaseURL": "https://openrouter.ai/api/v1"
-  },
   "apiProviders": {
     "openrouter": {
       "apiKey": "sk-this-will-be-replaced-by-env",
-      "apiBaseURL": "https://openrouter.ai/api/v1"
+      "apiBaseURL": "https://openrouter.ai/api/v1",
+      "enabled": true
     },
     "groq": {
       "apiKey": "sk-this-will-be-replaced-by-env",
-      "apiBaseURL": "https://api.groq.com/openai/v1"
+      "apiBaseURL": "https://api.groq.com/openai/v1",
+      "enabled": true
     }
   },
-  "model": "deepseek/deepseek-chat-v3-0324:free",
   "models": {
     "deepseek/deepseek-chat-v3-0324:free": {
       "name": "DeepSeek Chat V3",
       "description": "Free, strong at reasoning, supports tool use",
-      "apiProvider": "openrouter"
+      "apiProvider": "openrouter",
+      "enabled": true
+    },
+    "meta-llama/llama-4-scout-17b-16e-instruct": {
+      "name": "groq",
+      "enabled": true
     },
     "mistralai/mistral-small-3.1-24b-instruct:free": {
       "name": "Mistral Small 3.1",
@@ -39,9 +41,6 @@
       "name": "Kimi VL A3B Thinking",
       "description": "Multimodal, free, supports tool-calling",
       "apiProvider": "openrouter"
-    },
-    "meta-llama/llama-4-scout-17b-16e-instruct":{
-      "name": "groq"
     }
   },
   "mcpServers": {
@@ -70,8 +69,8 @@
     }
   },
   "embedding": {
-      "model": "Xenova/distiluse-base-multilingual-cased-v1",
-      "embeddingKey": "sk-this-will-be-replaced-by-env",
-      "embeddingBaseURL": "https://openrouter.ai/api/v1"
+    "model": "Xenova/distiluse-base-multilingual-cased-v1",
+    "embeddingKey": "sk-this-will-be-replaced-by-env",
+    "embeddingBaseURL": "https://openrouter.ai/api/v1"
   }
 }

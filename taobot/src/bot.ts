@@ -35,14 +35,15 @@ export default class Bot {
 
 
         dotenv.config();
-        const apiProviderConfig = aiConfig.getApiProviderConfig();
+        const { name: providerName, config: apiProviderConfig } = aiConfig.getEnabledApiProvider();
+        // const apiProviderConfig = aiConfig.getApiProviderConfig();
 
         const apiKey = process.env.OPENAI_API_KEY || apiProviderConfig.apiKey;
         const apiBaseURL = apiProviderConfig.apiBaseURL;
         logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(apiKey.length - 5)}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
-
-        const model = args[0] || aiConfig.getModelConfig();
+        const { name: modelName, config: modelConfig } = aiConfig.getEnabledModel();
+        const model = args[0] || modelName;
         logInfo(`Using LLM model: ${model}`);
 
 

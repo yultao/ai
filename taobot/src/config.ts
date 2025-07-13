@@ -10,6 +10,7 @@ interface McpServerConfig {
 interface ApiProviderConfig {
   apiKey: string;
   apiBaseURL: string;
+  enabled?: boolean;
 }
 
 interface EmbeddingConfig {
@@ -17,13 +18,20 @@ interface EmbeddingConfig {
   apiKey: string;
   apiBaseURL: string;
 }
-
+interface ModelConfig {
+  name: string;
+  description?: string;
+  apiProvider?: string;
+  enabled?: boolean; // new optional field
+}
 interface Config {
-  model: string;
+  // model: string;
+  models: { [key: string]: ModelConfig };
   mcpServers: {
     [name: string]: McpServerConfig;
   };
   apiProvider: ApiProviderConfig;
+  apiProviders: { [key: string]: ApiProviderConfig };
   embedding: EmbeddingConfig;
 }
 
@@ -42,9 +50,10 @@ export interface ServerEntry {
 export default class AiConfig {
   private static instance: AiConfig;
   private aiConfigPath: string;
-  private constructor(aiConfigPath: string) { 
+  private config: Config;
+  private constructor(aiConfigPath: string) {
     this.aiConfigPath = aiConfigPath;
-    this.readConfig();
+    this.config = this.readConfig();
   }
 
   public static getInstance(aiConfigPath: string = "ttconfig.json"): AiConfig {
@@ -61,28 +70,41 @@ export default class AiConfig {
     return config;
   }
 
-  getModelConfig(): string {
-    const config = this.readConfig();
-    return config.model;
+getEnabledModel(): { name: string; config: any } {
+  const config = this.readConfig();
+
+  const entry = Object.entries(config.models).find(
+    ([_, model]) => model.enabled === true
+  );
+
+  if (!entry) {
+    throw new Error("No enabled model found in config.models.");
   }
+
+  const [name, modelConfig] = entry;
+  return { name, config: modelConfig };
+}
 
   getEmbeddingConfig(): EmbeddingConfig {
-    const config = this.readConfig();
-    return config.embedding;
+    return this.config.embedding;
   }
 
-  getApiProviderConfig(): ApiProviderConfig {
-    const config = this.readConfig();
-    return config.apiProvider;
-    // const apiProviderConfig = config.apiProvider;
-    // return {
-    //   apiKey: apiProviderConfig.apiKey,
-    //   apiBaseURL: apiProviderConfig.apiBaseURL,
-    // };
+getEnabledApiProvider(): { name: string; config: ApiProviderConfig } {
+  const config = this.readConfig();
+
+  const entry = Object.entries(config.apiProviders).find(
+    ([_, provider]) => provider.enabled === true
+  );
+
+  if (!entry) {
+    throw new Error("No enabled API provider found.");
   }
+
+  const [name, providerConfig] = entry;
+  return { name, config: providerConfig };
+}
   getMcpServerConfigs(): ServerEntry[] {
-    const config = this.readConfig();
-    const servers: ServerEntry[] = Object.entries(config.mcpServers).map(
+    const servers: ServerEntry[] = Object.entries(this.config.mcpServers).map(
       ([name, { command, args, disabled }]) => ({
         name,
         command,
