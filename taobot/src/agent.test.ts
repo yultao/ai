@@ -1,5 +1,5 @@
 
-import MyAgent from './ai-agent.js';
+import MyAgent from './agent.js';
 import AiConfig from './config.js';
 
 import KnowledgeContext from './knowledge-context.js';

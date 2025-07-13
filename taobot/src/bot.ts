@@ -1,6 +1,6 @@
 
 // import MCPClient from './mcp-client.js';
-import MyAgent from './ai-agent.js';
+import MyAgent from './agent.js';
 import { logInfo, logError } from "./logger.js";
 import AiConfig from './config.js';
 import { createInterface } from "readline/promises";
@@ -21,7 +21,7 @@ export default class Bot {
      * @param prompt - if present, retrieve sepecific context according to prompt, otherwise full context
      * @returns 
      */
-    private async createAgent(knowledgeDir: string = "knowledge", prompt?:string) {
+    private async createAgent(knowledgeDir: string = "knowledge", prompt?: string) {
         logInfo("Starting my-agent...");
         // Parse command line arguments
         const args = process.argv.slice(2);
@@ -30,7 +30,7 @@ export default class Bot {
         const aiConfig = AiConfig.getInstance(this.aiConfigPath);
         const servers = aiConfig.getMcpServerConfigs();
         const mcpServers = servers.filter(server => !server.disabled);
-        logInfo(`Using MCP servers: ${JSON.stringify(mcpServers.map(s=>s.name))}`);
+        logInfo(`Using MCP servers: ${JSON.stringify(mcpServers.map(s => s.name))}`);
         // const mcpClients = activeServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
 
 
@@ -59,7 +59,7 @@ export default class Bot {
 
         logInfo(`Using knowledge folder: ${knowledgeDir}`);
         const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
-        const context = await knowledgeContext.retrieveContext(prompt); 
+        const context = await knowledgeContext.retrieveContext(prompt);
 
 
         const myAgent = new MyAgent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
@@ -68,12 +68,12 @@ export default class Bot {
         await myAgent.init();
         return myAgent;
     }
-    
+
 
     /*
     scenario 1: single question, based on a specific knowledge context
     */
-    public async query(prompt: string, knowledgeDir?:string) {
+    public async query(prompt: string, knowledgeDir?: string) {
         const myAgent = await this.createAgent(knowledgeDir, prompt);
         let response
         try {
@@ -88,10 +88,10 @@ export default class Bot {
     }
 
 
-    public async *streamQuery(prompt: string, knowledgeDir?:string): AsyncGenerator<string, void, unknown> {
+    public async *streamQuery(prompt: string, knowledgeDir?: string): AsyncGenerator<string, void, unknown> {
         const myAgent = await this.createAgent(knowledgeDir, prompt);
-         try {
-            const chatStream = await myAgent.stream(prompt);
+        try {
+            const chatStream = myAgent.stream(prompt);
             for await (const chunk of chatStream) {
                 yield chunk;
             }
@@ -101,34 +101,50 @@ export default class Bot {
             await myAgent.close();
         }
     }
-    
+
 
 
     /**
      * scnario 2: chat from time to time, based on a full knowledage base
      */
-    private longAgent?: MyAgent = undefined;
-    public async startConversation(knowledgeDir?: string) {
-        this.longAgent = await this.createAgent(knowledgeDir);
+    private agents: Record<string, MyAgent> = {};
+    public async startConversation(agentId: string, knowledgeDir?: string) {
+        this.agents[agentId] = await this.createAgent(knowledgeDir);
     }
-    public async continueConversation(question: string) {
+    public async continueConversation(agentId: string, question: string) {
+        const agent = this.agents[agentId];
         let response
         try {
-            response = await this.longAgent!.invoke(question);
+            response = await agent.invoke(question);
             // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
         } catch (error) {
-            logError(`Error invoking agent: ${error}`);
+            logError(`Error startConversation: ${error}`);
         }
         return response;
     }
-    public async stopConversation() {
-        await this.longAgent!.close();
+    
+    public async *streamContinueConversation(agentId: string, prompt: string): AsyncGenerator<string, void, unknown> {
+        const myAgent = this.agents[agentId];
+        let response
+        try {
+            const chatStream = myAgent.stream(prompt);
+            for await (const chunk of chatStream) {
+                yield chunk;
+            }
+        } catch (error) {
+            logError(`Error streamContinueConversation: ${error}`);
+        }
+        return response;
+    }
+
+    public async stopConversation(agentId: string) {
+        await this.agents[agentId].close();
     }
 
     /**
      * scenario 3: self-loop conversation, based on a full knowledge context
      */
-    public async chat(knowledgeDir?:string) {
+    public async chat(knowledgeDir?: string) {
         const rl = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -152,8 +168,8 @@ export default class Bot {
     }
 
 
-    
-    public async *streamChat(knowledgeDir?:string): AsyncGenerator<string, void, unknown> {
+
+    public async *streamChat(knowledgeDir?: string): AsyncGenerator<string, void, unknown> {
         const rl = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -178,5 +194,5 @@ export default class Bot {
             rl.close();
         }
     }
-    
+
 }

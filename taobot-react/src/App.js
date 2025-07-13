@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'; // <-- useRef & useEffect
 import ReactMarkdown from "react-markdown";
-
+// import { useParams } from 'react-router-dom';
+const chatId = Date.now();
 function App() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -19,7 +20,7 @@ function App() {
 
     let fullResponse = "";
 
-    const res = await fetch('http://localhost:3001/chat', {
+    const res = await fetch('http://localhost:3001/chat/'+chatId, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

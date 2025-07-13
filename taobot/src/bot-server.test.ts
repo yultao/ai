@@ -2,6 +2,10 @@ import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
 import dotenv from 'dotenv';
+
+
+
+
 import Bot from './bot.js';
 dotenv.config();
 const app = express();
@@ -13,41 +17,47 @@ const openai = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
 
 });
-const chatHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: "system", content: "You are a helpful assistant." }
-];
+const conversations: Record<string, OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = {};
 const bot = new Bot();
-app.post("/chat", async (req: any, res: any) => {
+
+app.post("/chat/:chatId", async (req: any, res: any) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
     try {
+        const chatId = req.params.chatId || "default-chat-id";
         const userMessage = req.body.message;
 
         // 先将用户的问题加入历史记录
+        if (!conversations[chatId]) {
+            conversations[chatId] = [
+                { role: "system", content: "You are a helpful assistant." }
+            ];
+            bot.startConversation(chatId);
+        }
+        const chatHistory = conversations[chatId];
+
         chatHistory.push({ role: "user", content: userMessage });
 
-        const chatStream = await bot.streamQuery(userMessage);
+        const chatStream = bot.streamContinueConversation(chatId, userMessage);
 
 
         let fullResponse = "";
 
         for await (const chunk of chatStream) {
-            if (chunk) {
-                fullResponse += chunk;
-                console.log(`data: ${chunk}\n\n`);
-                res.write(`data: ${chunk}\n\n`);
-            }
+            fullResponse += chunk;
+            // console.log(`data: ${chunk}\n\n`);
+            res.write(`data: ${chunk}\n\n`);
         }
 
         // Push the full result into your cache
         // 将 assistant 的回答也加入历史记录
         chatHistory.push({ role: "assistant", content: fullResponse });
-        if(chatHistory.length>5) {
+        if (chatHistory.length > 5) {
             chatHistory.shift();
         }
-        res.write("data: [DONE]"+chatHistory.length+"\n\n");
+        res.write("data: [DONE]" + chatId + ":" + chatHistory.length + "\n\n");
         res.end();
     } catch (err) {
         console.error("OpenAI error:", err);
