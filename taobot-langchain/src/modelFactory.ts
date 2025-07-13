@@ -22,10 +22,6 @@ export function createModel(): ChatOpenAI {
       modelName,
       configuration: {
         baseURL: "https://openrouter.ai/api/v1",
-        defaultHeaders: {
-          "HTTP-Referer": "https://your-app.com",
-          "X-Title": "LangChain Configurable Example",
-        },
       },
     });
   }

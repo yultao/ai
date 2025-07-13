@@ -1,4 +1,3 @@
-console.log("Hello, TypeScript with Node.js!");
 // src/index.ts
 
 import { createModel } from "./modelFactory.js";
@@ -10,6 +9,19 @@ async function main() {
   const res = await model.invoke("用一句话描述春天");
 
   console.log("💬 模型输出:", res.text);
+
+  console.log("================================");
+
+  const stream = await model.stream("用一句话描述春天");
+
+  process.stdout.write("💬 模型输出: ");
+  for await (const chunk of stream ) {
+    if (typeof chunk.content === "string") {
+      process.stdout.write(chunk.content);
+    }
+  }
+  console.log(); // 换行
+
 }
 
 main().catch(console.error);

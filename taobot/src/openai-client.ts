@@ -36,17 +36,17 @@ export default class OpenAIClient {
     }
 
 
-    async chat(promt?: string) {
+    async invoke(prompt?: string) {
         logInfo(`this.message.length: ${this.messages.length}`);
-        
+
 
         let content = '';
         const toolCallsMap = new Map<string, ToolCall>();
         try {
             logTitle("REQUEST");
-            if (promt) {
-                logGreenInfo(promt);
-                this.appendMessages({ role: 'user', content: promt });
+            if (prompt) {
+                logGreenInfo(prompt);
+                this.appendMessages({ role: 'user', content: prompt });
             } else {
                 logGreenInfo("No prompt");
             }
@@ -131,6 +131,82 @@ export default class OpenAIClient {
         });
 
         return { content, toolCalls };
+    }
+
+    public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
+        logTitle("REQUEST");
+        if (prompt) {
+            logGreenInfo(prompt);
+            this.appendMessages({ role: 'user', content: prompt });
+        } else {
+            logGreenInfo("No prompt");
+        }
+
+        const toolCallsMap = new Map<string, ToolCall>();
+        let accumulated = "";
+
+        const stream = await this.openai.chat.completions.create({
+            model: this.model,
+            messages: this.messages,
+            stream: true,
+            tools: this.getOpenAITools(),
+        });
+        
+        logTitle("RESPONSE");
+        for await (const part of stream) {
+            const delta = part.choices[0].delta;
+
+            // 普通内容
+            if (delta?.content) {
+                accumulated += delta.content;
+                yield delta.content;
+            }
+
+            // 工具调用内容
+            if (delta.tool_calls) {
+                for (const toolCall of delta.tool_calls) {
+                    const key = toolCall.index.toString();
+
+                    if (!toolCallsMap.has(key)) {
+                        toolCallsMap.set(key, {
+                            id: '',
+                            function: { name: '', arguments: '' },
+                        });
+                    }
+
+                    const current = toolCallsMap.get(key)!;
+
+                    if (toolCall.id) current.id += toolCall.id;
+                    if (toolCall.function?.name) current.function.name += toolCall.function.name;
+                    if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
+
+                    // 实时输出工具调用（拼接完成的部分也可以直接显示）
+                    const toolId = current.id;
+                    const toolName = current.function.name;
+                    const args = current.function.arguments;
+
+                    if (toolName && args) {
+                        yield `[TOOL_CALL]: ${toolId}: ${toolName}(${args})`;
+                    }
+                }
+            }
+        }
+        logTitle("END");
+
+        // 最终合并调用历史
+        const toolCalls = Array.from(toolCallsMap.values());
+        this.appendMessages({
+            role: 'assistant',
+            content: accumulated,
+            tool_calls: toolCalls.map(tc => ({
+                type: 'function',
+                id: tc.id,
+                function: {
+                    name: tc.function.name,
+                    arguments: tc.function.arguments,
+                },
+            })),
+        });
     }
 
     private getOpenAITools(): any {

@@ -87,6 +87,22 @@ export default class Bot {
         return response;
     }
 
+        /*
+    scenario 1: single question, based on a specific knowledge context
+    */
+    public async streamQuery(prompt: string, knowledgeDir?:string) {
+        const myAgent = await this.createAgent(knowledgeDir, prompt);
+        let response
+        try {
+            response = await myAgent.stream(prompt);
+            // logInfo(`Response: ${JSON.stringify(response, null, 2)}`);
+        } catch (error) {
+            logError(`Error invoking agent: ${error}`);
+        } finally {
+            await myAgent.close();
+        }
+        return response;
+    }
     
 
 
