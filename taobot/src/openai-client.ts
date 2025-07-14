@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { logInfo, logTitle, logGreenInfo, logWarn } from "./logger.js";
+import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "./logger.js";
 
 export interface ToolCall {
     id: string;
@@ -44,6 +44,7 @@ export default class OpenAIClient {
             } else {
                 logGreenInfo("No prompt");
             }
+            logError(JSON.stringify(this.messages));
 
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
@@ -128,7 +129,8 @@ export default class OpenAIClient {
         } else {
             logGreenInfo("No prompt");
         }
-
+        logError(JSON.stringify(this.messages));
+        
         const toolCallsMap = new Map<string, ToolCall>();
         let accumulated = "";
         try {
@@ -166,14 +168,28 @@ export default class OpenAIClient {
                         if (toolCall.id) current.id += toolCall.id;
                         if (toolCall.function?.name) current.function.name += toolCall.function.name;
                         if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
-
+                        logInfo("current::"+current.id+", "+current.function?.name+", "+current.function?.arguments);
                         // 实时输出工具调用（拼接完成的部分也可以直接显示）
                         const toolId = current.id;
                         const toolName = current.function.name;
                         const args = current.function.arguments;
 
                         if (toolName && args) {
-                            yield `[TOOL_CALL]: ${toolId}: ${toolName}(${args})`;
+                                    const toolCalls = Array.from(toolCallsMap.values());
+                            this.appendMessages({
+                                role: 'assistant',
+                                content: accumulated,
+                                tool_calls: toolCalls.map(tc => ({
+                                    type: 'function',
+                                    id: tc.id,
+                                    function: {
+                                        name: tc.function.name,
+                                        arguments: tc.function.arguments,
+                                    },
+                                })),
+                            });
+                            
+                            yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                         }
                     }
                 }
@@ -185,19 +201,25 @@ export default class OpenAIClient {
             logWarn(`Warn streamChat: ${err}`);
         }
         // 最终合并调用历史
-        const toolCalls = Array.from(toolCallsMap.values());
-        this.appendMessages({
-            role: 'assistant',
-            content: accumulated,
-            tool_calls: toolCalls.map(tc => ({
-                type: 'function',
-                id: tc.id,
-                function: {
-                    name: tc.function.name,
-                    arguments: tc.function.arguments,
-                },
-            })),
-        });
+        // const toolCalls = Array.from(toolCallsMap.values());
+        // this.appendMessages({
+        //     role: 'assistant',
+        //     content: accumulated,
+        //     tool_calls: toolCalls.map(tc => ({
+        //         type: 'function',
+        //         id: tc.id,
+        //         function: {
+        //             name: tc.function.name,
+        //             arguments: tc.function.arguments,
+        //         },
+        //     })),
+        // });
+        if (accumulated.trim()) {
+            this.appendMessages({
+                role: 'assistant',
+                content: accumulated,
+            });
+        }
     }
 
     private getOpenAITools(): any {

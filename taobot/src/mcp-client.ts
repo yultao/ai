@@ -61,7 +61,8 @@ export default class MCPClient {
     }
     public async callTool(toolName: string, args: Record<string, any>) {
         try {
-            return this.mcp.callTool({name: toolName, arguments: args});
+            const res = this.mcp.callTool({name: toolName, arguments: args});
+            return res;
         } catch (e) {
             logError("Failed to call tool "+toolName);
             return "";
