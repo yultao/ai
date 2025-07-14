@@ -44,7 +44,7 @@ export default class OpenAIClient {
             } else {
                 logGreenInfo("No prompt");
             }
-            logError(JSON.stringify(this.messages));
+            // logError(JSON.stringify(this.messages));
 
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
@@ -129,7 +129,7 @@ export default class OpenAIClient {
         } else {
             logGreenInfo("No prompt");
         }
-        logError(JSON.stringify(this.messages));
+        // logError(JSON.stringify(this.messages));
         
         const toolCallsMap = new Map<string, ToolCall>();
         let accumulated = "";
@@ -148,6 +148,7 @@ export default class OpenAIClient {
                 // 普通内容
                 if (delta?.content) {
                     accumulated += delta.content;
+                    process.stdout.write(delta.content);
                     yield delta.content;
                 }
 
@@ -194,7 +195,7 @@ export default class OpenAIClient {
                     }
                 }
             }
-
+            process.stdout.write("\n");
             yield "\n";
             logTitle("END STREAM");
         } catch (err) {

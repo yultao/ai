@@ -12,11 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,// 设置环境变量
-    baseURL: "https://openrouter.ai/api/v1",
 
-});
 const conversations: Record<string, OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = {};
 const bot = new Bot();
 
@@ -28,36 +24,26 @@ app.post("/chat/:chatId", async (req: any, res: any) => {
     try {
         const chatId = req.params.chatId || "default-chat-id";
         const userMessage = req.body.message;
-
+        
         // 先将用户的问题加入历史记录
         if (!conversations[chatId]) {
             conversations[chatId] = [
                 { role: "system", content: "You are a helpful assistant." }
             ];
-            bot.startConversation(chatId);//开启一个新的对话
+            await bot.startConversation(chatId);//开启一个新的对话
         }
-        const chatHistory = conversations[chatId];
-
-        chatHistory.push({ role: "user", content: userMessage });
 
         const chatStream = bot.streamContinueConversation(chatId, userMessage);
 
-
         let fullResponse = "";
-        res.write("data: "+ chatId + ":" + chatHistory.length + ": \n\n");
+        res.write("data: "+ chatId +": \n\n");
 
         for await (const chunk of chatStream) {
             fullResponse += chunk;
             // console.log(`data: ${chunk}\n\n`);
             res.write(`data: ${chunk}\n\n`);
         }
-
-        // Push the full result into your cache
-        // 将 assistant 的回答也加入历史记录
-        chatHistory.push({ role: "assistant", content: fullResponse });
-        if (chatHistory.length > 5) {
-            chatHistory.shift();
-        }
+       
         res.write("data: [DONE]\n\n");
         res.end();
     } catch (err) {
