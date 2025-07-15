@@ -1,18 +1,16 @@
-// src/modelFactory.ts
-
 import { ChatOpenAI } from "@langchain/openai";
-import { config } from "./config.js";
+import { ModelConfig } from "./config.js";
 import dotenv from "dotenv";
-
 dotenv.config();
 
-export function createModel(): ChatOpenAI {
-  const { provider, modelName } = config;
+export function createModel(config: ModelConfig): ChatOpenAI {
+  const { provider, modelName, streaming } = config;
 
   if (provider === "openai") {
     return new ChatOpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
       modelName,
+      streaming,
     });
   }
 
@@ -20,8 +18,9 @@ export function createModel(): ChatOpenAI {
     return new ChatOpenAI({
       openAIApiKey: process.env.OPENROUTER_API_KEY,
       modelName,
+      streaming,
       configuration: {
-        baseURL: "https://openrouter.ai/api/v1",
+        baseURL: "https://openrouter.ai/api/v1"
       },
     });
   }

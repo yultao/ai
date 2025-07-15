@@ -13,7 +13,7 @@ export const modelConfigs: Record<string, ModelConfig> = {
   },
   creative: {
     provider: "openrouter",
-    modelName: "deepseek/deepseek-chat-v3-0324:free",
-    streaming: false,
+    modelName: "mistralai/mistral-7b-instruct",
+    streaming: true,
   },
 };

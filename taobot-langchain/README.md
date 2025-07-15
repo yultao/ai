@@ -33,3 +33,5 @@ npm install langchain dotenv
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
+
+npm install langchain @langchain/openai dotenv

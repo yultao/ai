@@ -1,10 +1,11 @@
 // src/index.ts
-
+import { modelConfigs } from "./config.js";
 import { createModel } from "./modelFactory.js";
 // import { HumanMessage } from "langchain/schema/message";
 
 async function main() {
-  const model = createModel();
+  const config = modelConfigs["summarize"];
+  const model = createModel(config);
 
   const res = await model.invoke("用一句话描述春天");
 

@@ -26,33 +26,6 @@ const sometimeAgo: string = (now - 2400 * 60 * 60).toString();
 
 
 
-async function fetchSlackMessages(token: string,
-  channelId: string,
-  limit: number = 100
-): Promise<string[]> {
-  try {
-    const result = await app.client.conversations.history({
-      channel: channelId,
-      limit: limit,
-      oldest: sometimeAgo,
-    });
-
-    const messagesText: string[] = [];
-
-    if (result.messages) {
-      for (const msg of result.messages) {
-        const message = msg as { text?: string; ts?: string };
-        messagesText.push(message.text ?? '[no text]');
-      }
-    }
-
-    return messagesText;
-  } catch (err) {
-    console.error('Failed to fetch messages:', err);
-    return [];
-  }
-}
-
 // Create an MCP server
 const server = new McpServer({
   name: "demo-server",
