@@ -2,7 +2,7 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import Slack from '@slack/bolt';
-import { SlackReader } from "./slack-fetcher.js"
+import { SlackFetcher } from "./slack-fetcher.js"
 //https://www.youtube.com/watch?v=SbUv1nCS7a0&t=476s
 
 
@@ -28,7 +28,7 @@ const sometimeAgo: string = (now - 2400 * 60 * 60).toString();
 
 // Create an MCP server
 const server = new McpServer({
-  name: "demo-server",
+  name: "slack-mcp-server",
   version: "1.0.0"
 });
 
@@ -56,8 +56,8 @@ server.registerTool("read-slack-conversations",
     description: "Read Slack Converstaions History"
   },
   async (_input, context) => {
-    const slackReader = new SlackReader();
-    const results = await slackReader.getMessages();
+    const slackFetcher = new SlackFetcher();
+    const results = await slackFetcher.getMessages();
     return ({
       content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
     });

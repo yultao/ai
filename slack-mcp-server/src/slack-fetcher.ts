@@ -10,7 +10,7 @@ dotenv.config();
 
 
 
-export class SlackReader {
+export class SlackFetcher {
 
   private app: InstanceType<typeof Bolt.App>;
   private readonly token: string;
