@@ -20,7 +20,7 @@ export default class MCPClient {
         this.args = args;
     }
  
-    private async connectToServer() {
+    public async init() {
         try {
             this.transport = new StdioClientTransport({
                 command: this.command,
@@ -48,10 +48,6 @@ export default class MCPClient {
     }
 
     
-    public async init() {
-        await this.connectToServer();
-    }
-
     public async close() {
         await this.mcp.close();
     }
