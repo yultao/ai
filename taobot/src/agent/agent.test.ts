@@ -2,7 +2,7 @@
 import MyAgent from './agent.js';
 import AiConfig from '../util/config.js';
 
-import KnowledgeContext from '../retriever/knowledge-context.js';
+import KnowledgeContext from '../rag/knowledge-context.js';
 import { logInfo, logTitle } from "../util/logger.js";
 
 import dotenv from 'dotenv';

@@ -4,7 +4,7 @@ import Agent from './agent/agent.js';
 import { logInfo, logError } from "./util/logger.js";
 import Config from './util/config.js';
 import { createInterface } from "readline/promises";
-import KnowledgeContext from './retriever/knowledge-context.js';
+import KnowledgeContext from './rag/knowledge-context.js';
 import dotenv from 'dotenv';
 export default class Bot {
     private configPath: string;
