@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "./logger.js";
+import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "../util/logger.js";
 
 export interface ToolCall {
     id: string;
@@ -126,18 +126,16 @@ export default class OpenAIClient {
     }
 
     public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
-        logTitle("REQUEST STREAM");
-        if (prompt) {
-            logGreenInfo(prompt);
-            this.appendMessages({ role: 'user', content: prompt });
-        } else {
-            logGreenInfo("No prompt");
-        }
-        // logError(JSON.stringify(this.messages));
-        
-        const toolCallsMap = new Map<string, ToolCall>();
         let accumulated = "";
+        const suggestedToolCalls = new Map<string, ToolCall>();
         try {
+            logTitle("REQUEST STREAM");
+            if (prompt) {
+                logGreenInfo(prompt);
+                this.appendMessages({ role: 'user', content: prompt });
+            } else {
+                logGreenInfo("No prompt");
+            }
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
                 messages: this.messages,
@@ -147,43 +145,40 @@ export default class OpenAIClient {
 
             logTitle("RESPONSE STREAM");
             for await (const part of stream) {
-                const delta = part.choices[0].delta;
 
                 // 普通内容
-                if (delta?.content) {
-                    accumulated += delta.content;
-                    // process.stdout.write(delta.content);
-                    yield delta.content;
+                if (part.choices[0].delta?.content) {
+                    accumulated += part.choices[0].delta.content;
+                    yield part.choices[0].delta.content;
                 }
 
                 // 工具调用内容
-                if (delta.tool_calls) {
-                    for (const toolCall of delta.tool_calls) {
+                if (part.choices[0].delta.tool_calls) {
+                    for (const toolCall of part.choices[0].delta.tool_calls) {
                         const key = toolCall.index.toString();
 
-                        if (!toolCallsMap.has(key)) {
-                            toolCallsMap.set(key, {
+                        if (!suggestedToolCalls.has(key)) {
+                            suggestedToolCalls.set(key, {
                                 id: '',
                                 function: { name: '', arguments: '' },
                             });
                         }
 
-                        const current = toolCallsMap.get(key)!;
+                        const current = suggestedToolCalls.get(key)!;
 
                         if (toolCall.id) current.id += toolCall.id;
                         if (toolCall.function?.name) current.function.name += toolCall.function.name;
                         if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
-                        // logInfo("current::"+current.id+", "+current.function?.name+", "+current.function?.arguments);
                         // 实时输出工具调用（拼接完成的部分也可以直接显示）
                         const toolId = current.id;
                         const toolName = current.function.name;
                         const args = current.function.arguments;
-
+                        //一旦得到toolcall，立即存入历史
                         if (toolName && args) {
-                                    const toolCalls = Array.from(toolCallsMap.values());
+                            const toolCalls = Array.from(suggestedToolCalls.values());
                             this.appendMessages({
                                 role: 'assistant',
-                                content: accumulated,
+                                content: accumulated,//此时accumulated为空
                                 tool_calls: toolCalls.map(tc => ({
                                     type: 'function',
                                     id: tc.id,
@@ -193,11 +188,11 @@ export default class OpenAIClient {
                                     },
                                 })),
                             });
-                            
+
                             yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                         }
                     }
-                }
+                }//if tools
             }
             process.stdout.write("\n");
             yield "\n";
@@ -205,20 +200,6 @@ export default class OpenAIClient {
         } catch (err) {
             logWarn(`Warn streamChat: ${err}`);
         }
-        // 最终合并调用历史
-        // const toolCalls = Array.from(toolCallsMap.values());
-        // this.appendMessages({
-        //     role: 'assistant',
-        //     content: accumulated,
-        //     tool_calls: toolCalls.map(tc => ({
-        //         type: 'function',
-        //         id: tc.id,
-        //         function: {
-        //             name: tc.function.name,
-        //             arguments: tc.function.arguments,
-        //         },
-        //     })),
-        // });
         if (accumulated.trim()) {
             this.appendMessages({
                 role: 'assistant',
@@ -236,7 +217,6 @@ export default class OpenAIClient {
                 parameters: tool.inputSchema
             },
         }));
-        // logInfo(`OpenAI Tools: ${JSON.stringify(openapiTools)}`);
         return openapiTools;
     }
 

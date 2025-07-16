@@ -1,6 +1,6 @@
 
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "./logger.js";
+import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "../util/logger.js";
 export interface ToolCall {
   id: string;
   function: {
@@ -23,7 +23,7 @@ export default class LLMClient {
     this.tools = tools;
     if (systemPrompt) this.appendMessages({ role: 'system', content: systemPrompt });
     if (context) this.appendMessages({ role: 'user', content: context });
-    this.availableTools = this.getAvailableTools();
+    this.availableTools = this.getOpenAITools();
   }
   /*
   {
@@ -130,7 +130,7 @@ export default class LLMClient {
       // console.log("res: " + JSON.stringify(res));
 
       content = res.choices[0].message.content;
-      console.log("content: "+content);
+      logInfo("content: "+content);
 
       if (res.choices[0].message.tool_calls) {
         for (const toolCall of res.choices[0].message.tool_calls) {
@@ -144,7 +144,7 @@ export default class LLMClient {
           });
         }
       }
-      console.log("suggestedToolCalls: "+suggestedToolCalls);
+      logInfo("suggestedToolCalls: "+JSON.stringify(suggestedToolCalls));
       // res.choices[0].message.toolCalls;
       logTitle("END");
     } catch (err) {
@@ -282,7 +282,7 @@ export default class LLMClient {
   }
 
   public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
-    let content = "";
+    let accumulated = "";
     const suggestedToolCalls = new Map<string, ToolCall>();
     try {
       logTitle("REQUEST STREAM");
@@ -323,8 +323,7 @@ export default class LLMClient {
 
             // 普通内容
             if (part.choices[0].delta?.content) {
-              content += part.choices[0].delta.content;
-              //process.stdout.write(part.choices[0].delta.content);
+              accumulated += part.choices[0].delta.content;
               yield part.choices[0].delta.content;
             }
 
@@ -345,17 +344,16 @@ export default class LLMClient {
                 if (toolCall.id) current.id += toolCall.id;
                 if (toolCall.function?.name) current.function.name += toolCall.function.name;
                 if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
-                //logInfo("current::" + current.id + ", " + current.function?.name + ", " + current.function?.arguments);
                 // 实时输出工具调用（拼接完成的部分也可以直接显示）
                 const toolId = current.id;
                 const toolName = current.function.name;
                 const args = current.function.arguments;
-
-                if (toolName && args) {//收齐了
+                //一旦得到toolcall，立即存入历史
+                if (toolName && args) {
                   const toolCalls = Array.from(suggestedToolCalls.values());
                   this.appendMessages({
                     role: 'assistant',
-                    content: content,
+                    content: accumulated,//此时accumulated为空
                     tool_calls: toolCalls.map(tc => ({
                       type: 'function',
                       id: tc.id,
@@ -369,7 +367,7 @@ export default class LLMClient {
                   yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                 }
               }
-            }
+            }//if tools
           }
         }
       }
@@ -379,10 +377,10 @@ export default class LLMClient {
     } catch (err) {
       logWarn(`Warn streamChat: ${err}`);
     }
-    if (content.trim()) {
+    if (accumulated.trim()) {
       this.appendMessages({
         role: 'assistant',
-        content: content,
+        content: accumulated,
       });
     }
   }
@@ -413,7 +411,7 @@ export default class LLMClient {
     return res.body;
   }
 
-  private getAvailableTools(): any {
+  private getOpenAITools(): any {
     const openapiTools = this.tools.map(tool => ({
       type: 'function',
       function: {

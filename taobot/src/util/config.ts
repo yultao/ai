@@ -41,27 +41,17 @@ export interface ServerEntry {
   args: string[];
   disabled: boolean;
 }
-// interface ApiProviderEntry {
-//   apiKey: string;
-//   apiBaseURL: string;
-// }
 
 
-export default class AiConfig {
-  private static instance: AiConfig;
+export default class AnyNameConfig {
   private aiConfigPath: string;
   private config: Config;
-  private constructor(aiConfigPath: string) {
+  constructor(aiConfigPath: string) {
     this.aiConfigPath = aiConfigPath;
     this.config = this.readConfig();
   }
 
-  public static getInstance(aiConfigPath: string = "config.json"): AiConfig {
-    if (!AiConfig.instance) {
-      AiConfig.instance = new AiConfig(aiConfigPath);
-    }
-    return AiConfig.instance;
-  }
+
   private readConfig(): Config {
     const configPath = path.join(this.aiConfigPath);
 

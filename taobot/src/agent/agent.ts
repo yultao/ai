@@ -1,10 +1,10 @@
-import { logError, logInfo, logTitle } from "./logger.js";
-import MCPClient from "./mcp-client.js";
+import { logError, logInfo, logTitle } from "../util/logger.js";
+import MCPClient from "../mcp/mcp-client.js";
 // import OpenAIClient from "./openai-client.js";
-import OpenAIClient from "./llm-client.js";
+import OpenAIClient from "../llm/llm-client.js";
 
-import { ServerEntry } from "./config.js";
-export default class MyAgent {
+import { ServerEntry } from "../util/config.js";
+export default class AnyNameAgent {
     private mcpServers: ServerEntry[];
     private mcpClients: MCPClient[] = [];
     private llmClient: OpenAIClient | null = null; // Replace with actual type
@@ -102,14 +102,14 @@ export default class MyAgent {
                 const toolCallMatch = chunk.match(regex);
 
                 if (toolCallMatch && toolCallMatch.groups) {
-                    console.log("chunk for tool: " + chunk);
+                    //console.log("chunk for tool: " + chunk);
                     toolCalled = true;
 
                     const toolId = toolCallMatch.groups.id.trim();
                     const toolName = toolCallMatch.groups.name.trim();
                     const toolArgsRaw = toolCallMatch.groups.args.trim();
 
-                    logInfo(`[Agent] 正在调用工具 ${toolId}: ${toolName}，参数: ${toolArgsRaw}`);
+                    //logInfo(`[Agent] 正在调用工具 ${toolId}: ${toolName}，参数: ${toolArgsRaw}`);
 
                     let toolArgs: any;
                     try {
@@ -126,7 +126,7 @@ export default class MyAgent {
 
                     if (mcpClient) {
                         const result = await mcpClient.callTool(toolName, toolArgs);
-                        logInfo(`调用工具 ${toolId}:${toolName} 成功: ${JSON.stringify(result)}`);
+                        //logInfo(`调用工具 ${toolId}:${toolName} 成功: ${JSON.stringify(result)}`);
                         this.llmClient.appendToolResult(toolId, JSON.stringify(result));
                     } else {
                         logInfo(`未找到对应工具: ${toolId}:${toolName}`);
@@ -147,33 +147,6 @@ export default class MyAgent {
             // 清空 prompt，后续工具执行后不再传入初始 prompt
             currentPrompt = "";
         }
-    }
-
-
-    // 示例工具调用函数（需要你自己实现）
-    private async *callTool(id: string, name: string, args: string): AsyncGenerator<string> {
-        if (!this.llmClient) {
-            throw new Error("OpenAI client is not initialized.");
-        }
-        // 这里举个例子，真实调用根据你工具接口改写
-        logInfo(`[Agent] 正在调用工具 ${id}: ${name}，参数: ${args} ...`);
-        const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === name));
-        if (mcpClient) {
-            // Call the tool using the MCP client
-            // logInfo(`Executing ${mcpClient.getName()} tool ${name} with arguments: ${args}`);
-
-            const result = await mcpClient.callTool(name, JSON.parse(args));
-            // logInfo(`Executed  ${mcpClient.getName()} tool ${name} with result: ${JSON.stringify(result)}`);
-            console.log("STEAMING: [[[" + JSON.stringify(result) + "]]]")
-            yield JSON.stringify(result);
-            this.llmClient.appendToolResult(id, JSON.stringify(result));
-
-        } else {
-            logInfo(`No MCP client found for tool ${name}.`);
-            this.llmClient.appendToolResult(id, "No MCP client found for this tool.");
-        }
-        logInfo(`\n工具 ${name} 执行完毕`);
-        //yield `\n工具 ${name} 执行完毕。`;
     }
 
     public async close() {

@@ -1,4 +1,4 @@
-import { logInfo } from "./logger.js";
+import { logInfo } from "../util/logger.js";
 
 export interface VectorStoreItem {
     embedding: number[],

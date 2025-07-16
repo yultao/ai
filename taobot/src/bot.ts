@@ -1,18 +1,17 @@
 
 // import MCPClient from './mcp-client.js';
-import MyAgent from './agent.js';
-import { logInfo, logError } from "./logger.js";
-import AiConfig from './config.js';
+import Agent from './agent/agent.js';
+import { logInfo, logError } from "./util/logger.js";
+import Config from './util/config.js';
 import { createInterface } from "readline/promises";
-import KnowledgeContext from './knowledge-context.js';
+import KnowledgeContext from './retriever/knowledge-context.js';
 import dotenv from 'dotenv';
 export default class Bot {
-    private aiConfigPath: string;
+    private configPath: string;
 
 
     constructor(aiConfigPath: string = "config.json") {
-        this.aiConfigPath = aiConfigPath;
-
+        this.configPath = aiConfigPath;
     }
 
     /**
@@ -27,7 +26,7 @@ export default class Bot {
         const args = process.argv.slice(2);
         logInfo(`Using args: ${JSON.stringify(args)}`);
 
-        const aiConfig = AiConfig.getInstance(this.aiConfigPath);
+        const aiConfig = new Config(this.configPath);
         const servers = aiConfig.getMcpServerConfigs();
         const mcpServers = servers.filter(server => !server.disabled);
         logInfo(`Using MCP servers: ${JSON.stringify(mcpServers.map(s => s.name))}`);
@@ -62,7 +61,7 @@ export default class Bot {
         const context = await knowledgeContext.retrieveContext(prompt);
 
 
-        const myAgent = new MyAgent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
+        const myAgent = new Agent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
 
 
         await myAgent.init();
@@ -107,7 +106,7 @@ export default class Bot {
     /**
      * scnario 2: chat from time to time, based on a full knowledage base
      */
-    private agents: Record<string, MyAgent> = {};
+    private agents: Record<string, Agent> = {};
     public async startConversation(agentId: string, knowledgeDir?: string) {
         this.agents[agentId] = await this.createAgent(knowledgeDir);
     }

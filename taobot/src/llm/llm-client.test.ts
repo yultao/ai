@@ -1,6 +1,6 @@
 import LLMClient from './llm-client.js';
 import dotenv from 'dotenv';
-import MCPClient from "./mcp-client.js";
+import MCPClient from "../mcp/mcp-client.js";
 
 async function invokeInvoke() {
     console.log("Starting invokeInvoke...");

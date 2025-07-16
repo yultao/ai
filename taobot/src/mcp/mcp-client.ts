@@ -2,7 +2,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { Tool } from "@modelcontextprotocol/sdk/types";
-import { logError } from "./logger.js";
+import { logError } from "../util/logger.js";
 
 
 export default class MCPClient {

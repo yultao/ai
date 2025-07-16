@@ -1,4 +1,17 @@
-
+Test
+```
+cls;npx tsc;node dist/agent/agent.test.js
+cls;npx tsc;node dist/llm/llm-client.test.js
+cls;npx tsc;node dist/llm/openai-client.test.js
+cls;npx tsc;node dist/mcp/mcp-client.test.js
+cls;npx tsc;node dist/bot-query.test.js
+cls;npx tsc;node dist/bot-query.stream.test.js
+cls;npx tsc;node dist/bot-conversation.test.js
+cls;npx tsc;node dist/bot-conversation.stream.test.js
+cls;npx tsc;node dist/bot-chat.test.js
+cls;npx tsc;node dist/bot-chat.stream.test.js
+cls;npx tsc;node dist/bot-server.test.js
+```
 ---
 
 # 🧠 TT AI Agent

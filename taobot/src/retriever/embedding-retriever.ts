@@ -1,7 +1,7 @@
 import VectorStore from "./vector-store.js";
 import OpenAI from 'openai';
 import { pipeline } from '@xenova/transformers';
-import { logInfo } from "./logger.js";
+import { logInfo } from "../util/logger.js";
 
 export default class EmbeddingRetriever {
     private model: string;

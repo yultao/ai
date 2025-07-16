@@ -1,7 +1,7 @@
 import EmbeddingRetriever from "./embedding-retriever.js";
 import * as fs from 'fs/promises';
 import * as path from "path";
-import { logInfo, logTitle } from "./logger.js";
+import { logInfo, logTitle } from "../util/logger.js";
 import { existsSync } from 'fs';
 export default class KnowledgeContext {
     private model: string
