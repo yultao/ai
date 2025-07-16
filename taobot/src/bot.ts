@@ -39,14 +39,11 @@ export default class Bot {
 
         const apiKey = process.env[apiProviderConfig.apiKey]||"";
         const apiBaseURL = apiProviderConfig.apiBaseURL;
-        logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(apiKey.length - 5)}`);
+        logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(Math.min(10, apiKey.length - 5))}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
         const { name: modelName, config: modelConfig } = aiConfig.getEnabledModel();
         const model = args[0] || modelName;
         logInfo(`Using LLM model: ${model}`);
-
-
-
 
 
         const systemPrompt = "You are an AI assitant";
@@ -57,9 +54,9 @@ export default class Bot {
 
 
         logInfo(`Using knowledge folder: ${knowledgeDir}`);
-        const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
-        const context = await knowledgeContext.retrieveContext(prompt);
-
+        // const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
+        // const context = await knowledgeContext.retrieveContext(prompt);
+        const context = "";
 
         const myAgent = new Agent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
 

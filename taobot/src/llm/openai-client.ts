@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "../util/logger.js";
+import { logInfo, logTitle, logWarn, logError, logDebug } from "../util/logger.js";
 
 export interface ToolCall {
     id: string;
@@ -43,12 +43,12 @@ export default class OpenAIClient {
         try {
             logTitle("REQUEST");
             if (prompt) {
-                logGreenInfo(prompt);
+                logInfo(prompt);
                 this.appendMessages({ role: 'user', content: prompt });
             } else {
-                logGreenInfo("No prompt");
+                logInfo("No prompt");
             }
-            // logError(JSON.stringify(this.messages));
+            logDebug(JSON.stringify(this.messages));
 
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
@@ -71,7 +71,7 @@ export default class OpenAIClient {
                 if (part.choices[0].delta.tool_calls) {
                     for (const toolCall of part.choices[0].delta.tool_calls) {
 
-                        const key = toolCall.index.toString();
+                        const key = toolCall.id || "";
                         if (!suggestedToolCalls.has(key)) {
                             suggestedToolCalls.set(key, {
                                 id: '',
@@ -125,16 +125,16 @@ export default class OpenAIClient {
         return { content, toolCalls };
     }
 
-    public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
+    public async *streamStream(prompt: string): AsyncGenerator<string, void, unknown> {
         let accumulated = "";
         const suggestedToolCalls = new Map<string, ToolCall>();
         try {
             logTitle("REQUEST STREAM");
             if (prompt) {
-                logGreenInfo(prompt);
+                logInfo(prompt);
                 this.appendMessages({ role: 'user', content: prompt });
             } else {
-                logGreenInfo("No prompt");
+                logInfo("No prompt");
             }
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
@@ -155,7 +155,7 @@ export default class OpenAIClient {
                 // 工具调用内容
                 if (part.choices[0].delta.tool_calls) {
                     for (const toolCall of part.choices[0].delta.tool_calls) {
-                        const key = toolCall.index.toString();
+                        const key = toolCall.id || "";
 
                         if (!suggestedToolCalls.has(key)) {
                             suggestedToolCalls.set(key, {
@@ -223,7 +223,7 @@ export default class OpenAIClient {
 
     private appendMessages(message: OpenAI.Chat.Completions.ChatCompletionMessageParam) {
         this.messages.push(message);           // Add to end
-        if (this.messages.length > 100000) {
+        while (this.messages.length > 20) {
             this.messages.shift();            // Remove from front if over limit
         }
     }

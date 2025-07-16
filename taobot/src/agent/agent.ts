@@ -1,4 +1,4 @@
-import { logError, logInfo, logTitle } from "../util/logger.js";
+import { logDebug, logError, logInfo, logTitle, logWarn } from "../util/logger.js";
 import MCPClient from "../mcp/mcp-client.js";
 // import OpenAIClient from "./openai-client.js";
 import OpenAIClient from "../llm/llm-client.js";
@@ -61,15 +61,15 @@ export default class AnyNameAgent {
                     const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === toolCall.function.name));
                     if (mcpClient) {
                         // Call the tool using the MCP client
-                        // logInfo(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
+                        logDebug(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
 
                         const result = await mcpClient.callTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
-                        // logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
+                        logDebug(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
                         //console.log("INVOKE: [[[" + JSON.stringify(result) + "]]]")
                         this.llmClient.appendToolResult(toolCall.id, JSON.stringify(result));
 
                     } else {
-                        logInfo(`No MCP client found for tool ${toolCall.function.name}.`);
+                        logWarn(`No MCP client found for tool ${toolCall.function.name}.`);
                         this.llmClient.appendToolResult(toolCall.id, "No MCP client found for this tool.");
 
                     }
@@ -95,7 +95,7 @@ export default class AnyNameAgent {
         let currentPrompt = prompt;
 
         while (true) {
-            const openaiStream = this.llmClient.stream(currentPrompt);
+            const openaiStream = this.llmClient.streamStream(currentPrompt);
             let toolCalled = false;
 
             for await (const chunk of openaiStream) {
@@ -109,13 +109,13 @@ export default class AnyNameAgent {
                     const toolName = toolCallMatch.groups.name.trim();
                     const toolArgsRaw = toolCallMatch.groups.args.trim();
 
-                    //logInfo(`[Agent] 正在调用工具 ${toolId}: ${toolName}，参数: ${toolArgsRaw}`);
+                    logDebug(`[Agent] 正在调用工具 ${toolId}: ${toolName}，参数: ${toolArgsRaw}`);
 
                     let toolArgs: any;
                     try {
                         toolArgs = JSON.parse(toolArgsRaw);
                     } catch (err) {
-                        logInfo(`工具参数 JSON 解析失败: ${toolArgsRaw}`);
+                        logWarn(`工具参数 JSON 解析失败: ${toolArgsRaw}`);
                         this.llmClient.appendToolResult(toolId, "Invalid tool arguments.");
                         continue;
                     }
@@ -125,11 +125,13 @@ export default class AnyNameAgent {
                     );
 
                     if (mcpClient) {
+                        logDebug(`Executing ${mcpClient.getName()} tool ${toolName} with arguments: ${toolArgs}`);
+
                         const result = await mcpClient.callTool(toolName, toolArgs);
-                        //logInfo(`调用工具 ${toolId}:${toolName} 成功: ${JSON.stringify(result)}`);
+                        logDebug(`Executed  ${mcpClient.getName()} tool ${toolName} with result: ${JSON.stringify(result)}`);
                         this.llmClient.appendToolResult(toolId, JSON.stringify(result));
                     } else {
-                        logInfo(`未找到对应工具: ${toolId}:${toolName}`);
+                        logWarn(`未找到对应工具: ${toolId}:${toolName}`);
                         this.llmClient.appendToolResult(toolId, `No MCP client found for ${toolName}`);
                     }
 

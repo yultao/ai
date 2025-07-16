@@ -1,6 +1,6 @@
 
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { logInfo, logTitle, logGreenInfo, logWarn, logError } from "../util/logger.js";
+import { logInfo, logTitle, logWarn, logDebug } from "../util/logger.js";
 export interface ToolCall {
   id: string;
   function: {
@@ -100,41 +100,48 @@ export default class LLMClient {
     try {
       logTitle("REQUEST");
       if (prompt) {
-        logGreenInfo(prompt);
+        logInfo(prompt);
         this.appendMessages({ role: 'user', content: prompt });
       } else {
-        logGreenInfo("No prompt");
+        logInfo("No prompt");
       }
 
       const url = `${this.apiBaseURL}/chat/completions`;
+      const body = JSON.stringify({
+        model: this.model,
+        messages: this.messages,
+        tools: this.availableTools,//tell openai the available tools
+      });
+      logDebug("req: " + body);
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          model: this.model,
-          messages: this.messages,
-          tools: this.availableTools,//tell openai the available tools
-        })
+        body: body
       });
-      
+
       if (!response.ok) {
         const err = await response.text();
-        throw new Error(`OpenRouter API error: ${response.statusText}`);
+        throw new Error(`API error: ${response.ok}, ${err}, ${JSON.stringify(response)}`);
       }
 
       logTitle("RESPONSE");
       const res = await response.json();
-      // console.log("res: " + JSON.stringify(res));
+      const ress = JSON.stringify(res);
+      logDebug("res: " + ress);
 
-      content = res.choices[0].message.content;
-      logInfo("content: "+content);
+      if (res.choices[0].message.content) {
+        content = res.choices[0].message.content;
+        logInfo('.'.repeat(content.length))
+      }
 
       if (res.choices[0].message.tool_calls) {
+
+        logInfo(':'.repeat(res.choices[0].message.tool_calls.length))
         for (const toolCall of res.choices[0].message.tool_calls) {
-          const key = toolCall.index.toString();
+          const key = toolCall.id;
           suggestedToolCalls.set(key, {
             id: toolCall.id,
             function: {
@@ -144,7 +151,6 @@ export default class LLMClient {
           });
         }
       }
-      logInfo("suggestedToolCalls: "+JSON.stringify(suggestedToolCalls));
       // res.choices[0].message.toolCalls;
       logTitle("END");
     } catch (err) {
@@ -154,18 +160,25 @@ export default class LLMClient {
     //suggested tools by openai
     let toolCalls: ToolCall[] = Array.from(suggestedToolCalls.values());
     // push the final message to the messages array
-    this.appendMessages({
-      role: 'assistant',
-      content,
-      tool_calls: toolCalls.map(toolCall => ({
-        type: 'function',
-        id: toolCall.id,
-        function: {
-          name: toolCall.function.name,
-          arguments: toolCall.function.arguments,
-        },
-      })),
-    });
+    if (toolCalls.length === 0) {
+      this.appendMessages({
+        role: 'assistant',
+        content
+      });
+    } else {
+      this.appendMessages({
+        role: 'assistant',
+        content,
+        tool_calls: toolCalls.map(toolCall => ({
+          type: 'function',
+          id: toolCall.id,
+          function: {
+            name: toolCall.function.name,
+            arguments: toolCall.function.arguments,
+          },
+        })),
+      });
+    }
     return { content, toolCalls };
   }
 
@@ -177,10 +190,10 @@ export default class LLMClient {
     try {
       logTitle("REQUEST IS");
       if (prompt) {
-        logGreenInfo(prompt);
+        logInfo(prompt);
         this.appendMessages({ role: 'user', content: prompt });
       } else {
-        logGreenInfo("No prompt");
+        logInfo("No prompt");
       }
       // logError(JSON.stringify(this.messages));
       const body = await this.callLLM(true);
@@ -210,7 +223,10 @@ export default class LLMClient {
               break;
             }
             const part = JSON.parse(json);
-
+            if (!part.choices) {
+              logWarn(JSON.stringify(part));
+              break;
+            }
 
             if (part.choices?.[0]?.delta?.content) {
               content += part.choices[0].delta.content;
@@ -222,7 +238,7 @@ export default class LLMClient {
               //console.log(part.choices[0].delta.tool_calls); // or yield delta;
               for (const toolCall of part.choices[0].delta.tool_calls) {
 
-                const key = toolCall.index.toString();
+                const key = toolCall.id;
                 if (!suggestedToolCalls.has(key)) {
                   suggestedToolCalls.set(key, {
                     id: '',
@@ -259,40 +275,47 @@ export default class LLMClient {
       process.stdout.write("\n");
       logTitle("END IS");
     } catch (err) {
-      logWarn(`Warn invokeChat: ${err}`);
+      logWarn(`Warn invokeStream: ${err}`);
     }
 
     //suggested tools by openai
     let toolCalls: ToolCall[] = Array.from(suggestedToolCalls.values());
     // push the final message to the messages array
-    this.appendMessages({
-      role: 'assistant',
-      content,
-      tool_calls: toolCalls.map(toolCall => ({
-        type: 'function',
-        id: toolCall.id,
-        function: {
-          name: toolCall.function.name,
-          arguments: toolCall.function.arguments,
-        },
-      })),
-    });
+    if (toolCalls.length === 0) {
+      this.appendMessages({
+        role: 'assistant',
+        content
+      });
+    } else {
+      this.appendMessages({
+        role: 'assistant',
+        content,
+        tool_calls: toolCalls.map(toolCall => ({
+          type: 'function',
+          id: toolCall.id,
+          function: {
+            name: toolCall.function.name,
+            arguments: toolCall.function.arguments,
+          },
+        })),
+      });
+    }
 
     return { content, toolCalls };
   }
 
-  public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
+  public async *streamStream(prompt: string): AsyncGenerator<string, void, unknown> {
     let accumulated = "";
     const suggestedToolCalls = new Map<string, ToolCall>();
     try {
       logTitle("REQUEST STREAM");
       if (prompt) {
-        logGreenInfo(prompt);
+        logInfo(prompt);
         this.appendMessages({ role: 'user', content: prompt });
       } else {
-        logGreenInfo("No prompt");
+        logInfo("No prompt");
       }
-      // logError(JSON.stringify(this.messages));
+      logDebug("req: " + JSON.stringify(this.messages));
 
 
       const body = await this.callLLM(true);
@@ -320,7 +343,11 @@ export default class LLMClient {
               break;
             }
             const part = JSON.parse(json);
-
+            // logDebug(JSON.stringify(part));
+            if (!part.choices) {
+              logWarn(JSON.stringify(part));
+              break;
+            }
             // 普通内容
             if (part.choices[0].delta?.content) {
               accumulated += part.choices[0].delta.content;
@@ -330,7 +357,7 @@ export default class LLMClient {
             // 工具调用内容
             if (part.choices[0].delta.tool_calls) {
               for (const toolCall of part.choices[0].delta.tool_calls) {
-                const key = toolCall.index.toString();
+                const key = toolCall.id;
 
                 if (!suggestedToolCalls.has(key)) {
                   suggestedToolCalls.set(key, {
@@ -368,8 +395,8 @@ export default class LLMClient {
                 }
               }
             }//if tools
-          }
-        }
+          }//if (line.startsWith('data: ')) {
+        }//for (const line of lines) {
       }
       process.stdout.write("\n");
       yield "\n";
@@ -433,7 +460,7 @@ export default class LLMClient {
 
   private appendMessages(message: any) {
     this.messages.push(message);           // Add to end
-    if (this.messages.length > 100000) {
+    while (this.messages.length > 20) {
       this.messages.shift();            // Remove from front if over limit
     }
   }

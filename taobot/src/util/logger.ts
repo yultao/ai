@@ -8,8 +8,9 @@ function getMessage(prefix: string, message: string): string {
     const paddedMessage = `[${prefix}] ${message}${padding}`;
     return paddedMessage;
 }
-export  function logGreenInfo(message: string): void {
-    console.log(chalk.green(`${getMessage("INFO", message)}`));
+export  function logDebug(message: string): void {
+    if(process.env.DEBUG)
+        console.log(chalk.green(`${getMessage("DEBUG", message)}`));
 }
 
 export  function logInfo(message: string): void {
@@ -17,10 +18,10 @@ export  function logInfo(message: string): void {
 }
 
 export  function logError(message: string): void {
-    console.log(chalk.red(`${getMessage("ERRR", message)}`));
+    console.log(chalk.redBright(`${getMessage("ERRR", message)}`));
 }
 export  function logWarn(message: string): void {
-    console.log(chalk.grey(`${getMessage("WARN", message)}`));
+    console.log(chalk.red(`${getMessage("WARN", message)}`));
 }
 
 export function logTitle(message: string): void {

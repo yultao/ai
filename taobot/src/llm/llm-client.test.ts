@@ -47,7 +47,7 @@ async function invokeStream() {
     }
 }
 
-async function stream() {
+async function streamStream() {
     console.log("Starting invokeStream...");
     dotenv.config();
 
@@ -63,7 +63,7 @@ async function stream() {
     }
     const tools = mcpClients.flatMap(client => client.getTools());
     const client = new LLMClient(apiKey, apiBaseURL, model, tools, "", "");
-    const stream = client.stream("show my slack channels using available mcp tools");
+    const stream = client.streamStream("show my slack channels using available mcp tools");
 
     for await (const chunk of stream) {
         process.stdout.write(chunk);
