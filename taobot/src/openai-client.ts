@@ -30,7 +30,11 @@ export default class OpenAIClient {
         this.availableTools = this.getOpenAITools();
     }
 
-    async invoke(prompt?: string) {
+    async invokeInvoke(prompt?: string) {
+        return this.invokeStream(prompt);//todo 
+    }
+
+    async invokeStream(prompt?: string) {
         logInfo(`this.message.length: ${this.messages.length}`);
 
 
@@ -148,7 +152,7 @@ export default class OpenAIClient {
                 // 普通内容
                 if (delta?.content) {
                     accumulated += delta.content;
-                    process.stdout.write(delta.content);
+                    // process.stdout.write(delta.content);
                     yield delta.content;
                 }
 
@@ -169,7 +173,7 @@ export default class OpenAIClient {
                         if (toolCall.id) current.id += toolCall.id;
                         if (toolCall.function?.name) current.function.name += toolCall.function.name;
                         if (toolCall.function?.arguments) current.function.arguments += toolCall.function.arguments;
-                        logInfo("current::"+current.id+", "+current.function?.name+", "+current.function?.arguments);
+                        // logInfo("current::"+current.id+", "+current.function?.name+", "+current.function?.arguments);
                         // 实时输出工具调用（拼接完成的部分也可以直接显示）
                         const toolId = current.id;
                         const toolName = current.function.name;

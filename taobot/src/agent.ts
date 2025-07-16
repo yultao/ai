@@ -49,7 +49,7 @@ export default class MyAgent {
             throw new Error("OpenAI client is not initialized.");
         }
         let res = "";
-        let response = await this.openAIClient!.invoke(prompt);
+        let response = await this.openAIClient!.invokeStream(prompt);
         while (true) {
             // console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
 
@@ -151,60 +151,7 @@ export default class MyAgent {
             currentPrompt = "";
         }
     }
-    public async *stream22(prompt: string): AsyncGenerator<string, void, unknown> {
-        if (!this.openAIClient) {
-            throw new Error("OpenAI client is not initialized.");
-        }
-        const regex = /\[TOOL_CALL]\[ID=(?<id>[^\]]+)]\[NAME=(?<name>[^\]]+)]\[ARGS=(?<args>{.*})]/;
-        let openaiStream = this.openAIClient.stream(prompt);
-        // while (true) {
-        for await (const chunk of openaiStream) {
-            // 检查是不是工具调用标记
-            const toolCallMatch = chunk.match(regex);
 
-
-            if (toolCallMatch) {
-                const toolId = toolCallMatch[1].trim();    // call_haXqUuVbTtCqOOig3gQABQ
-                const toolName = toolCallMatch[2].trim();  // read-slack-conversations
-                const toolArgs = toolCallMatch[3].trim();  // {}
-                // 假设你有一个调用工具的函数，且支持流式返回结果
-                // const toolStream = this.callTool(toolId, toolName, toolArgs);
-
-                // for await (const toolOutput of toolStream) {
-                //     // 把工具执行过程中的内容流式返回给用户
-                //     yield toolOutput;
-                // }
-
-
-                // 这里举个例子，真实调用根据你工具接口改写
-                logInfo(`[Agent] 正在调用工具 ${toolId}: ${toolName}，参数: ${toolArgs} ...`);
-                const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === toolName));
-                if (mcpClient) {
-                    // Call the tool using the MCP client
-                    // logInfo(`Executing ${mcpClient.getName()} tool ${name} with arguments: ${args}`);
-
-                    const result = await mcpClient.callTool(toolName, JSON.parse(toolArgs));
-                    // logInfo(`Executed  ${mcpClient.getName()} tool ${name} with result: ${JSON.stringify(result)}`);
-                    console.log("STEAMING: [[[" + JSON.stringify(result) + "]]]")
-                    // yield JSON.stringify(result);
-                    this.openAIClient.appendToolResult(toolId, JSON.stringify(result));
-
-                } else {
-                    logInfo(`No MCP client found for tool ${toolName}.`);
-                    this.openAIClient.appendToolResult(toolId, "No MCP client found for this tool.");
-                }
-                logInfo(`\n工具 ${toolName} 执行完毕`);
-
-                // logInfo("工具调用结束，发个空的请求");
-                // 工具调用结束后，继续接收openaiClient输出
-            } else {
-                // 普通文本直接返回
-                logInfo("chunk: " + chunk);
-                yield chunk;
-            }
-        }
-        // }
-    }
 
     // 示例工具调用函数（需要你自己实现）
     private async *callTool(id: string, name: string, args: string): AsyncGenerator<string> {
