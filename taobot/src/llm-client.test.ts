@@ -38,7 +38,7 @@ async function invokeStream() {
     }
     const tools = mcpClients.flatMap(client => client.getTools());
     const client = new LLMClient(apiKey, apiBaseURL, model, tools, "", "");
-    const response = await client.invokeStream("show my slack channels using available mcp tools");
+    const response = await client.invokeStream("");
 
     console.log("content:", response.content); 
     console.log("toolCalls:", response.toolCalls); 
@@ -51,10 +51,12 @@ async function stream() {
     console.log("Starting invokeStream...");
     dotenv.config();
 
-    const apiKey = process.env.OPENAI_API_KEY || "";
-    // const apiBaseURL = "https://openrouter.ai/api/v1";
-    const apiBaseURL = "https://api.groq.com/openai/v1";
-    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const apiKey = process.env["OPENROUTER_API_KEY"] || "";
+    const apiBaseURL = "https://openrouter.ai/api/v1";
+    const model = "deepseek/deepseek-chat-v3-0324:free";
+    // const apiKey = process.env["OPENAI_API_KEY"] || "";
+    // const apiBaseURL = "https://api.groq.com/openai/v1";
+    // const model = "meta-llama/llama-4-scout-17b-16e-instruct";
     const mcpClients = [new MCPClient(`test-client`, "node", ["C:/Workspace/ai/slack-mcp-server/dist/index.js"])];
     for (const client of mcpClients) {
         await client.init();

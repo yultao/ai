@@ -37,10 +37,7 @@ export default class LLMClient {
       },
       body: JSON.stringify({
         model: this.model,
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: prompt }
-        ],
+        messages: this.messages,
         // stream: true,
         tools: this.availableTools,//tell openai the available tools
 
@@ -75,34 +72,10 @@ export default class LLMClient {
         logGreenInfo("No prompt");
       }
       // logError(JSON.stringify(this.messages));
-      const url = `${this.apiBaseURL}/chat/completions`;
-      // console.log(url);
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [{
-            role: 'user',
-            content: prompt
-          }],
-          stream: true,
-          tools: this.availableTools,//tell openai the available tools
-
-        })
-      });
-
-      // ✅ 检查 res.body 是否存在
-      if (!res.ok || !res.body) {
-        throw new Error(`Failed to connect or response body is null: ${res.status}`);
-      }
-      logTitle("RESPONSE IS");
-      const reader = res.body.getReader();
+      const body = await this.callLLM();
+      const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
-
+      logTitle("RESPONSE IS");
       let buffer = '';
       while (true) {
         const { value, done } = await reader.read();
@@ -175,7 +148,7 @@ export default class LLMClient {
       process.stdout.write("\n");
       logTitle("END IS");
     } catch (err) {
-      logWarn(`Warn chat: ${err}`);
+      logWarn(`Warn invokeChat: ${err}`);
     }
 
     //suggested tools by openai
@@ -211,33 +184,9 @@ export default class LLMClient {
       // logError(JSON.stringify(this.messages));
 
 
-      const url = `${this.apiBaseURL}/chat/completions`;
-      // console.log(url);
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [{
-            role: 'user',
-            content: prompt
-          }],
-          stream: true,
-          tools: this.availableTools,//tell openai the available tools
-
-        })
-      });
-
-      // ✅ 检查 res.body 是否存在
-      if (!res.ok || !res.body) {
-        throw new Error(`Failed to connect or response body is null: ${res.status}`);
-      }
+      const body = await this.callLLM();
       logTitle("RESPONSE STREAM");
-      const reader = res.body.getReader();
+      const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
 
       let buffer = '';
@@ -325,6 +274,32 @@ export default class LLMClient {
         content: content,
       });
     }
+  }
+
+  private async callLLM() {
+    const url = `${this.apiBaseURL}/chat/completions`;
+    // console.log(url);
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: this.model,
+        messages: this.messages,
+        stream: true,
+        tools: this.availableTools, //tell openai the available tools
+      })
+    });
+
+    // ✅ 检查 res.body 是否存在
+    if (!res.ok || !res.body) {
+      throw new Error(`Failed to connect or response body is null: ${res.ok},${res.body},${JSON.stringify(res)}`);
+    }
+
+
+    return res.body;
   }
 
   private getAvailableTools(): any {
