@@ -1,6 +1,6 @@
 {
   "name": "taobot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A headlss AI agent supporting MCP and RAG",
   "type": "module",
   "main": "index.js",
