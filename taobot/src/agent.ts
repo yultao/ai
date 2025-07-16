@@ -46,7 +46,7 @@ export default class MyAgent {
             throw new Error("OpenAI client is not initialized.");
         }
         let res = "";
-        let response = await this.llmClient!.invokeStream(prompt);
+        let response = await this.llmClient!.invokeInvoke(prompt);
         while (true) {
             // console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
 
@@ -54,18 +54,18 @@ export default class MyAgent {
             if (response.toolCalls.length > 0) {
                 // 如果有工具调用，处理每个工具调用
                 for (const toolCall of response.toolCalls) {
-                    console.log("chunk for tool: " + toolCall.id+", "+toolCall.function.name+", "+toolCall.function.arguments);
+                    //console.log("chunk for tool: " + toolCall.id+", "+toolCall.function.name+", "+toolCall.function.arguments);
                     //logInfo(`Tool call returned by LLM: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
 
                     // Find the MCP client that has the tool
                     const mcpClient = this.mcpClients.find(client => client.getTools().some(tool => tool.name === toolCall.function.name));
                     if (mcpClient) {
                         // Call the tool using the MCP client
-                        logInfo(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
+                        // logInfo(`Executing ${mcpClient.getName()} tool ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`);
 
                         const result = await mcpClient.callTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
                         // logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
-                        console.log("INVOKE: [[[" + JSON.stringify(result) + "]]]")
+                        //console.log("INVOKE: [[[" + JSON.stringify(result) + "]]]")
                         this.llmClient.appendToolResult(toolCall.id, JSON.stringify(result));
 
                     } else {
@@ -75,12 +75,12 @@ export default class MyAgent {
                     }
                 }
                 // 工具调用之后，发送空请求？
-                response = await this.llmClient.invokeStream();
+                response = await this.llmClient.invokeInvoke();
 
                 // continue; // Continue to process the next response
             } else {
                 res = response.content;//如果没有工具调用，返回内容
-                console.log("INVOKE: " + res);
+                //console.log("INVOKE: " + res);
                 break;
             }
         }

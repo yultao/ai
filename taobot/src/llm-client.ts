@@ -25,37 +25,148 @@ export default class LLMClient {
     if (context) this.appendMessages({ role: 'user', content: context });
     this.availableTools = this.getAvailableTools();
   }
-
-  async invokeInvoke(prompt: string) {
-    const url = `${this.apiBaseURL}/chat/completions`;
-    console.log(url);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: this.model,
-        messages: this.messages,
-        // stream: true,
-        tools: this.availableTools,//tell openai the available tools
-
-      })
-    });
-
-    console.log("response.ok: " + response.ok);
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`OpenRouter API error: ${response.statusText}`);
+  /*
+  {
+    "id": "gen-1752636571-xwlkl2yclMvN4F7HiSP3",
+    "provider": "Chutes",
+    "model": "deepseek/deepseek-chat-v3-0324:free",
+    "object": "chat.completion",
+    "created": 1752636571,
+    "choices": [
+      {
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "tool_calls",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "id": "call_jvv078rjQB6oTUIYKI7JpA",
+              "index": 2,
+              "type": "function",
+              "function": {
+                "name": "read-slack-conversations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2393,
+      "completion_tokens": 19,
+      "total_tokens": 2412,
+      "prompt_tokens_details": null
     }
-    const res = await response.json();
-    console.log("res: " + JSON.stringify(res));
-    const content = res.choices[0].message.content;
-    let toolCalls: ToolCall[] = [];
-    // res.choices[0].message.toolCalls;
+  }
+  */
+  /*
+  {
+   "id": "gen-1752637310-Of86xrlw0V5aKihmqKdC",
+   "provider": "Chutes",
+   "model": "deepseek/deepseek-chat-v3-0324:free",
+   "object": "chat.completion",
+   "created": 1752637310,
+   "choices": [
+     {
+       "logprobs": null,
+       "finish_reason": "stop",
+       "native_finish_reason": "stop",
+       "index": 0,
+       "message": {
+         "role": "assistant",
+         "content": "Here are the details of your Slack channels and recent conversations:\n\n### Channel: **C093KD45H3N-all-tt**\n- **Recent Activity**:\n  1. **User joined**: `<@U093KD43HHA>` joined the channel.\n  2. **Message**: \"This is sent to all-tt\".\n  3. **Message**: \"I did something else in all-tt\".\n  4. **Message**: \"I called ads team for a bug\" (with replies in a thread).\n\nIf you'd like more details or actions on any of these channels, let me know!",
+         "refusal": null,
+         "reasoning": null
+       }
+     }
+   ],
+   "usage": {
+     "prompt_tokens": 3445,
+     "completion_tokens": 125,
+     "total_tokens": 3570,
+     "prompt_tokens_details": null
+   }
+ }
+  */
+  async invokeInvoke(prompt?: string) {
+    let content = '';
+    const suggestedToolCalls = new Map<string, ToolCall>();
+    try {
+      logTitle("REQUEST");
+      if (prompt) {
+        logGreenInfo(prompt);
+        this.appendMessages({ role: 'user', content: prompt });
+      } else {
+        logGreenInfo("No prompt");
+      }
 
-    return { content, "toolCalls": res.choices[0].message.toolCalls };
+      const url = `${this.apiBaseURL}/chat/completions`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: this.messages,
+          tools: this.availableTools,//tell openai the available tools
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`OpenRouter API error: ${response.statusText}`);
+      }
+
+      logTitle("RESPONSE");
+      const res = await response.json();
+      // console.log("res: " + JSON.stringify(res));
+
+      content = res.choices[0].message.content;
+      console.log("content: "+content);
+
+      if (res.choices[0].message.tool_calls) {
+        for (const toolCall of res.choices[0].message.tool_calls) {
+          const key = toolCall.index.toString();
+          suggestedToolCalls.set(key, {
+            id: toolCall.id,
+            function: {
+              name: toolCall.function.name,
+              arguments: toolCall.function.arguments,
+            },
+          });
+        }
+      }
+      console.log("suggestedToolCalls: "+suggestedToolCalls);
+      // res.choices[0].message.toolCalls;
+      logTitle("END");
+    } catch (err) {
+      logWarn(`Warn invokeChat: ${err}`);
+    }
+
+    //suggested tools by openai
+    let toolCalls: ToolCall[] = Array.from(suggestedToolCalls.values());
+    // push the final message to the messages array
+    this.appendMessages({
+      role: 'assistant',
+      content,
+      tool_calls: toolCalls.map(toolCall => ({
+        type: 'function',
+        id: toolCall.id,
+        function: {
+          name: toolCall.function.name,
+          arguments: toolCall.function.arguments,
+        },
+      })),
+    });
+    return { content, toolCalls };
   }
 
   async invokeStream(prompt?: string) {
@@ -72,7 +183,7 @@ export default class LLMClient {
         logGreenInfo("No prompt");
       }
       // logError(JSON.stringify(this.messages));
-      const body = await this.callLLM();
+      const body = await this.callLLM(true);
       const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
       logTitle("RESPONSE IS");
@@ -184,7 +295,7 @@ export default class LLMClient {
       // logError(JSON.stringify(this.messages));
 
 
-      const body = await this.callLLM();
+      const body = await this.callLLM(true);
       logTitle("RESPONSE STREAM");
       const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
@@ -276,7 +387,7 @@ export default class LLMClient {
     }
   }
 
-  private async callLLM() {
+  private async callLLM(stream: boolean) {
     const url = `${this.apiBaseURL}/chat/completions`;
     // console.log(url);
     const res = await fetch(url, {
@@ -288,7 +399,7 @@ export default class LLMClient {
       body: JSON.stringify({
         model: this.model,
         messages: this.messages,
-        stream: true,
+        stream: stream,
         tools: this.availableTools, //tell openai the available tools
       })
     });

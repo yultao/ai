@@ -72,4 +72,4 @@ async function stream() {
         await client.close();
     }
 }
-stream();
+invokeInvoke();
