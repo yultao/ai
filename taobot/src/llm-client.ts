@@ -61,7 +61,7 @@ export default class LLMClient {
     return { content, "toolCalls": res.choices[0].message.toolCalls };
   }
 
-  async invokeStream(prompt: string) {
+  async invokeStream(prompt?: string) {
     // logInfo(`this.message.length: ${this.messages.length}`);
 
     let content = '';
@@ -339,7 +339,13 @@ export default class LLMClient {
     // logInfo(`OpenAI Tools: ${JSON.stringify(openapiTools)}`);
     return openapiTools;
   }
-
+  public appendToolResult(toolCallId: string, toolOutput: string): void {
+    this.appendMessages({
+      role: 'tool',
+      content: toolOutput,
+      tool_call_id: toolCallId,
+    });
+  }
 
   private appendMessages(message: any) {
     this.messages.push(message);           // Add to end

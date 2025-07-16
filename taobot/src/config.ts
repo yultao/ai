@@ -56,7 +56,7 @@ export default class AiConfig {
     this.config = this.readConfig();
   }
 
-  public static getInstance(aiConfigPath: string = "ttconfig.json"): AiConfig {
+  public static getInstance(aiConfigPath: string = "config.json"): AiConfig {
     if (!AiConfig.instance) {
       AiConfig.instance = new AiConfig(aiConfigPath);
     }

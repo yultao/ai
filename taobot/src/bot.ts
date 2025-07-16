@@ -10,7 +10,7 @@ export default class Bot {
     private aiConfigPath: string;
 
 
-    constructor(aiConfigPath: string = "ttconfig.json") {
+    constructor(aiConfigPath: string = "config.json") {
         this.aiConfigPath = aiConfigPath;
 
     }
@@ -38,7 +38,7 @@ export default class Bot {
         const { name: providerName, config: apiProviderConfig } = aiConfig.getEnabledApiProvider();
         // const apiProviderConfig = aiConfig.getApiProviderConfig();
 
-        const apiKey = process.env.OPENAI_API_KEY || apiProviderConfig.apiKey;
+        const apiKey = process.env[apiProviderConfig.apiKey]||"";
         const apiBaseURL = apiProviderConfig.apiBaseURL;
         logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(apiKey.length - 5)}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);

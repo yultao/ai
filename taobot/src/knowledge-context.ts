@@ -2,7 +2,7 @@ import EmbeddingRetriever from "./embedding-retriever.js";
 import * as fs from 'fs/promises';
 import * as path from "path";
 import { logInfo, logTitle } from "./logger.js";
-
+import { existsSync } from 'fs';
 export default class KnowledgeContext {
     private model: string
     private knowledgeDir: string;
@@ -32,6 +32,7 @@ export default class KnowledgeContext {
             return this.retrieveFullContext();
     }
     private async readAllFilesRecursive(dir: string): Promise<string[]> {
+        if(!(existsSync(dir))) return [];
         const entries = await fs.readdir(dir, { withFileTypes: true });
         const files: string[] = [];
 

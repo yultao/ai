@@ -1,12 +1,13 @@
 import { logError, logInfo, logTitle } from "./logger.js";
 import MCPClient from "./mcp-client.js";
-import OpenAIClient from "./openai-client.js";
+// import OpenAIClient from "./openai-client.js";
+import OpenAIClient from "./llm-client.js";
 
 import { ServerEntry } from "./config.js";
 export default class MyAgent {
     private mcpServers: ServerEntry[];
     private mcpClients: MCPClient[] = [];
-    private openAIClient: OpenAIClient | null = null; // Replace with actual type
+    private llmClient: OpenAIClient | null = null; // Replace with actual type
     private model: string;
     private apiKey: string;
     private apiBaseURL: string;
@@ -31,25 +32,21 @@ export default class MyAgent {
 
     public async init() {
         logInfo("Initializing agent with model: " + this.model);
-        // Initialize MCP clients
         this.mcpClients = this.mcpServers.map(server => new MCPClient(`${server.name}-client`, server.command, server.args));
         for (const client of this.mcpClients) {
             await client.init();
         }
-
-        // Collect tools from all MCP clients
         const tools = this.mcpClients.flatMap(client => client.getTools());
-        // Initialize OpenAI client with the provided model, system prompt, tools, and context
-        this.openAIClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
+        this.llmClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
 
     }
 
     public async invoke(prompt: string) {
-        if (!this.openAIClient) {
+        if (!this.llmClient) {
             throw new Error("OpenAI client is not initialized.");
         }
         let res = "";
-        let response = await this.openAIClient!.invokeStream(prompt);
+        let response = await this.llmClient!.invokeStream(prompt);
         while (true) {
             // console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
 
@@ -69,16 +66,16 @@ export default class MyAgent {
                         const result = await mcpClient.callTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
                         // logInfo(`Executed  ${mcpClient.getName()} tool ${toolCall.function.name} with result: ${JSON.stringify(result)}`);
                         console.log("INVOKE: [[[" + JSON.stringify(result) + "]]]")
-                        this.openAIClient.appendToolResult(toolCall.id, JSON.stringify(result));
+                        this.llmClient.appendToolResult(toolCall.id, JSON.stringify(result));
 
                     } else {
                         logInfo(`No MCP client found for tool ${toolCall.function.name}.`);
-                        this.openAIClient.appendToolResult(toolCall.id, "No MCP client found for this tool.");
+                        this.llmClient.appendToolResult(toolCall.id, "No MCP client found for this tool.");
 
                     }
                 }
                 // 工具调用之后，发送空请求？
-                response = await this.openAIClient.invoke();
+                response = await this.llmClient.invokeStream();
 
                 // continue; // Continue to process the next response
             } else {
@@ -90,7 +87,7 @@ export default class MyAgent {
         return res;
     }
     public async *stream(prompt: string): AsyncGenerator<string, void, unknown> {
-        if (!this.openAIClient) {
+        if (!this.llmClient) {
             throw new Error("OpenAI client is not initialized.");
         }
         const regex = /\[TOOL_CALL]\[ID=(?<id>[^\]]+)]\[NAME=(?<name>[^\]]+)]\[ARGS=(?<args>{.*?})]/;
@@ -98,7 +95,7 @@ export default class MyAgent {
         let currentPrompt = prompt;
 
         while (true) {
-            const openaiStream = this.openAIClient.stream(currentPrompt);
+            const openaiStream = this.llmClient.stream(currentPrompt);
             let toolCalled = false;
 
             for await (const chunk of openaiStream) {
@@ -119,7 +116,7 @@ export default class MyAgent {
                         toolArgs = JSON.parse(toolArgsRaw);
                     } catch (err) {
                         logInfo(`工具参数 JSON 解析失败: ${toolArgsRaw}`);
-                        this.openAIClient.appendToolResult(toolId, "Invalid tool arguments.");
+                        this.llmClient.appendToolResult(toolId, "Invalid tool arguments.");
                         continue;
                     }
 
@@ -130,10 +127,10 @@ export default class MyAgent {
                     if (mcpClient) {
                         const result = await mcpClient.callTool(toolName, toolArgs);
                         logInfo(`调用工具 ${toolId}:${toolName} 成功: ${JSON.stringify(result)}`);
-                        this.openAIClient.appendToolResult(toolId, JSON.stringify(result));
+                        this.llmClient.appendToolResult(toolId, JSON.stringify(result));
                     } else {
                         logInfo(`未找到对应工具: ${toolId}:${toolName}`);
-                        this.openAIClient.appendToolResult(toolId, `No MCP client found for ${toolName}`);
+                        this.llmClient.appendToolResult(toolId, `No MCP client found for ${toolName}`);
                     }
 
                     // 工具调用后，重新发起新的 stream，请求后续内容
@@ -155,7 +152,7 @@ export default class MyAgent {
 
     // 示例工具调用函数（需要你自己实现）
     private async *callTool(id: string, name: string, args: string): AsyncGenerator<string> {
-        if (!this.openAIClient) {
+        if (!this.llmClient) {
             throw new Error("OpenAI client is not initialized.");
         }
         // 这里举个例子，真实调用根据你工具接口改写
@@ -169,11 +166,11 @@ export default class MyAgent {
             // logInfo(`Executed  ${mcpClient.getName()} tool ${name} with result: ${JSON.stringify(result)}`);
             console.log("STEAMING: [[[" + JSON.stringify(result) + "]]]")
             yield JSON.stringify(result);
-            this.openAIClient.appendToolResult(id, JSON.stringify(result));
+            this.llmClient.appendToolResult(id, JSON.stringify(result));
 
         } else {
             logInfo(`No MCP client found for tool ${name}.`);
-            this.openAIClient.appendToolResult(id, "No MCP client found for this tool.");
+            this.llmClient.appendToolResult(id, "No MCP client found for this tool.");
         }
         logInfo(`\n工具 ${name} 执行完毕`);
         //yield `\n工具 ${name} 执行完毕。`;
