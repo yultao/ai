@@ -1,6 +1,7 @@
 import VectorStore from "./vector-store.js";
 import OpenAI from 'openai';
 import { pipeline } from '@xenova/transformers';
+import SimpleEmbedder from './simple-embedder.js';
 import { logInfo } from "../util/logger.js";
 
 export default class EmbeddingRetriever {
@@ -24,6 +25,13 @@ export default class EmbeddingRetriever {
             document: document
         });
         return embedding;
+    }
+    private async embed2(text: string): Promise<number[]> {
+        const vocabPath = 'node_modules/bert-tokenizer/assets/vocab.json'
+
+        const embedder = new SimpleEmbedder(vocabPath, 64);
+        const embeddingVector = embedder.embed(text);
+        return embeddingVector;
     }
     private async embed(text: string): Promise<number[]> {
         const extractor = await pipeline('feature-extraction', this.model);

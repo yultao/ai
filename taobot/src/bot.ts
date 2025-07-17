@@ -54,9 +54,10 @@ export default class Bot {
 
 
         logInfo(`Using knowledge folder: ${knowledgeDir}`);
-        // const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
-        // const context = await knowledgeContext.retrieveContext(prompt);
-        const context = "";
+        const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
+        await knowledgeContext.init();
+        const context = await knowledgeContext.retrieveContext(prompt);
+        // const context = "";
 
         const myAgent = new Agent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
 

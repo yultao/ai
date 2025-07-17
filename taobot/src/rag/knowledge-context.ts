@@ -4,23 +4,25 @@ import * as path from "path";
 import { logInfo, logTitle } from "../util/logger.js";
 import { existsSync } from 'fs';
 export default class KnowledgeContext {
-    private model: string
     private knowledgeDir: string;
 
     private er: EmbeddingRetriever;
     constructor(model: string, knowledgeDir: string) {
-        this.model = model;
+     
         this.knowledgeDir = knowledgeDir;
-        this.er = new EmbeddingRetriever(this.model);
-        this.embedKnowledgeBase();//初始化向量数据库
+        this.er = new EmbeddingRetriever(model);
+        
     }
 
-    private async embedKnowledgeBase() {
+    public async init() {
         const files = await this.readAllFilesRecursive(this.knowledgeDir);
 
         for (const file of files) {
             const document = await fs.readFile(file, 'utf-8');
-            await this.er.embedDocument(document);
+            const messages = JSON.parse(document);
+            for (const message of messages) {
+                await this.er.embedDocument(JSON.stringify(message));
+            }
         }
     }
 
