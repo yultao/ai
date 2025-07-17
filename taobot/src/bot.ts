@@ -6,6 +6,10 @@ import Config from './util/config.js';
 import { createInterface } from "readline/promises";
 import KnowledgeContext from './rag/knowledge-context.js';
 import dotenv from 'dotenv';
+// interface QueryOptions {
+//     knowledgeDir?: string;
+//     stream?: boolean;
+// }
 export default class Bot {
     private configPath: string;
 
@@ -37,7 +41,7 @@ export default class Bot {
         const { name: providerName, config: apiProviderConfig } = aiConfig.getEnabledApiProvider();
         // const apiProviderConfig = aiConfig.getApiProviderConfig();
 
-        const apiKey = process.env[apiProviderConfig.apiKey]||"";
+        const apiKey = process.env[apiProviderConfig.apiKey] || "";
         const apiBaseURL = apiProviderConfig.apiBaseURL;
         logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(Math.min(10, apiKey.length - 5))}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
@@ -54,10 +58,10 @@ export default class Bot {
 
 
         logInfo(`Using knowledge folder: ${knowledgeDir}`);
-        const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
-        await knowledgeContext.init();
-        const context = await knowledgeContext.retrieveContext(prompt);
-        // const context = "";
+        // const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
+        // await knowledgeContext.init();
+        // const context = await knowledgeContext.retrieveContext(prompt);
+        const context = "";
 
         const myAgent = new Agent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
 
@@ -66,11 +70,32 @@ export default class Bot {
         return myAgent;
     }
 
+    // public query(
+    //     prompt: string,
+    //     options: QueryOptions & { stream: true }
+    // ): AsyncGenerator<string, void, unknown>;
 
+    // public query(
+    //     prompt: string,
+    //     options?: QueryOptions & { stream?: false }
+    // ): Promise<string>;
+
+    // public async *query(
+    //     prompt: string,
+    //     options: QueryOptions = {}
+    // ): Promise<string> | AsyncGenerator<string, void, unknown> {
+    //     const { knowledgeDir, stream } = options;
+
+    //     if (stream) {
+    //         return this.streamQuery(prompt, knowledgeDir);
+    //     } else {
+    //         return this.invokeQuery(prompt, knowledgeDir);
+    //     }
+    // }
     /*
     scenario 1: single question, based on a specific knowledge context
     */
-    public async query(prompt: string, knowledgeDir?: string) {
+    public async invokeQuery(prompt: string, knowledgeDir?: string) {
         const myAgent = await this.createAgent(knowledgeDir, prompt);
         let response
         try {
@@ -119,7 +144,7 @@ export default class Bot {
         }
         return response;
     }
-    
+
     public async *streamContinueConversation(agentId: string, prompt: string): AsyncGenerator<string, void, unknown> {
         const myAgent = this.agents[agentId];
         let response
@@ -138,10 +163,29 @@ export default class Bot {
         await this.agents[agentId].close();
     }
 
+
+    // public chat(
+    //     options: QueryOptions & { stream: true }
+    // ): AsyncGenerator<string, void, unknown>;
+
+    // public chat(
+    //     options?: QueryOptions & { stream?: false }
+    // ): Promise<string>;
+    // public async *chat(
+    //     options: QueryOptions = {}
+    // ): Promise<string> | AsyncGenerator<string, void, unknown> {
+    //     const { knowledgeDir, stream } = options;
+
+    //     if (stream) {
+    //         return this.streamChat(knowledgeDir);
+    //     } else {
+    //         return this.invokeChat(knowledgeDir);
+    //     }
+    // }
     /**
      * scenario 3: self-loop conversation, based on a full knowledge context
      */
-    public async chat(knowledgeDir?: string) {
+    public async invokeChat(knowledgeDir?: string) {
         const rl = createInterface({
             input: process.stdin,
             output: process.stdout
@@ -150,7 +194,7 @@ export default class Bot {
         try {
 
             while (true) {
-                const prompt = await rl.question("taobot> ");
+                const prompt = await rl.question("> ");
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }
@@ -174,7 +218,7 @@ export default class Bot {
         try {
 
             while (true) {
-                const prompt = await rl.question("taobot> ");
+                const prompt = await rl.question(">> ");
                 if (prompt.trim().toLowerCase() === "exit") {
                     break;
                 }
