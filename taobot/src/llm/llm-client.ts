@@ -197,11 +197,12 @@ export default class LLMClient {
       } else {
         logInfo("No prompt");
       }
-      // logError(JSON.stringify(this.messages));
+      logDebug(JSON.stringify(this.messages));
       const body = await this.callLLM(true);
       const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
       logTitle("RESPONSE IS");
+
       let buffer = '';
       while (true) {
         const { value, done } = await reader.read();
@@ -233,14 +234,15 @@ export default class LLMClient {
             if (part.choices?.[0]?.delta?.content) {
               content += part.choices[0].delta.content;
               process.stdout.write(part.choices[0].delta.content);
-              // console.log('∆', content); // or yield delta;
             }
 
             if (part.choices[0].delta.tool_calls) {
-              //console.log(part.choices[0].delta.tool_calls); // or yield delta;
+              logInfo(':'.repeat(part.choices[0].message.tool_calls.length))
+              logDebug(JSON.stringify(part.choices[0].delta.tool_calls))
+
               for (const toolCall of part.choices[0].delta.tool_calls) {
 
-                const key = toolCall.id;
+                const key = toolCall.index + "";
                 if (!suggestedToolCalls.has(key)) {
                   suggestedToolCalls.set(key, {
                     id: '',
@@ -265,18 +267,18 @@ export default class LLMClient {
                     currentToolCall!.function.arguments += toolCall.function.arguments;
                   }
                 }
+                logInfo("currentToolCall: " + currentToolCall)
+
               }// end for each tool call
             }//handle tools
 
           }// end if (line.startsWith('data: '))
 
         }
-        // console.log("222");
       }//end of while
-      // console.log("ENDDDD");
       process.stdout.write("\n");
 
-      
+
       logDebug("content: " + content);
       logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
 
@@ -362,8 +364,9 @@ export default class LLMClient {
 
             // 工具调用内容
             if (part.choices[0].delta.tool_calls) {
+
               for (const toolCall of part.choices[0].delta.tool_calls) {
-                const key = toolCall.id;
+                const key = toolCall.index +"";
 
                 if (!suggestedToolCalls.has(key)) {
                   suggestedToolCalls.set(key, {
@@ -403,6 +406,9 @@ export default class LLMClient {
               }
             }//if tools
           }//if (line.startsWith('data: ')) {
+          else {
+            //logDebug("not start with data: " + line);
+          }
         }//for (const line of lines) {
       }
       process.stdout.write("\n");

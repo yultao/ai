@@ -35,13 +35,13 @@ export default class OpenAIClient {
     }
 
     async invokeStream(prompt?: string) {
-        logInfo(`this.message.length: ${this.messages.length}`);
+        // logInfo(`this.message.length: ${this.messages.length}`);
 
 
         let content = '';
         const suggestedToolCalls = new Map<string, ToolCall>();
         try {
-            logTitle("REQUEST");
+            logTitle("REQUEST IS");
             if (prompt) {
                 logInfo(prompt);
                 this.appendMessages({ role: 'user', content: prompt });
@@ -59,7 +59,7 @@ export default class OpenAIClient {
             });
 
 
-            logTitle("RESPONSE");
+            logTitle("RESPONSE IS");
 
             for await (const part of stream) {
                 if (part.choices[0].delta.content) {
@@ -100,7 +100,12 @@ export default class OpenAIClient {
                 }//handle tools
             }//handle stream end
             process.stdout.write("\n");
-            logTitle("END");
+
+      logDebug("content: " + content);
+      logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
+
+
+            logTitle("END IS");
 
         } catch (err) {
             logWarn(`Warn chat: ${err}`);
@@ -126,7 +131,7 @@ export default class OpenAIClient {
     }
 
     public async *streamStream(prompt: string): AsyncGenerator<string, void, unknown> {
-        let accumulated = "";
+        let content = "";
         const suggestedToolCalls = new Map<string, ToolCall>();
         try {
             logTitle("REQUEST STREAM");
@@ -142,21 +147,23 @@ export default class OpenAIClient {
                 stream: true,
                 tools: this.availableTools,
             });
+            logDebug("req: " + JSON.stringify(this.messages));
 
             logTitle("RESPONSE STREAM");
             for await (const part of stream) {
 
                 // 普通内容
                 if (part.choices[0].delta?.content) {
-                    accumulated += part.choices[0].delta.content;
+                    content += part.choices[0].delta.content;
                     yield part.choices[0].delta.content;
                 }
 
                 // 工具调用内容
                 if (part.choices[0].delta.tool_calls) {
+                    logInfo(':'.repeat(part.choices[0].delta.tool_calls.length))
+                    logDebug("part: "+JSON.stringify(part.choices[0].delta.tool_calls))
                     for (const toolCall of part.choices[0].delta.tool_calls) {
-                        const key = toolCall.id || "";
-
+                        const key = toolCall.index +"";
                         if (!suggestedToolCalls.has(key)) {
                             suggestedToolCalls.set(key, {
                                 id: '',
@@ -178,7 +185,7 @@ export default class OpenAIClient {
                             const toolCalls = Array.from(suggestedToolCalls.values());
                             this.appendMessages({
                                 role: 'assistant',
-                                content: accumulated,//此时accumulated为空
+                                content: content,//此时accumulated为空
                                 tool_calls: toolCalls.map(tc => ({
                                     type: 'function',
                                     id: tc.id,
@@ -188,24 +195,25 @@ export default class OpenAIClient {
                                     },
                                 })),
                             });
-
+                            logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
                             yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                         }
                     }
                 }//if tools
             }
-            process.stdout.write("\n");
-            yield "\n";
+            // process.stdout.write("\n");
+            // yield "\n";
             logTitle("END STREAM");
         } catch (err) {
-            logWarn(`Warn streamChat: ${err}`);
+            logWarn(`Warn streamStream: ${err}`);
         }
-        if (accumulated.trim()) {
+        if (content.trim()) {
             this.appendMessages({
                 role: 'assistant',
-                content: accumulated,
+                content: content,
             });
         }
+        logDebug("content: " + content);
     }
 
     private getOpenAITools(): any {

@@ -201,7 +201,7 @@ export default class Bot {
                 await myAgent.invoke(prompt);
             }
         } catch (error) {
-            logError(`Error chat: ${error}`);
+            logError(`Error invokeChat: ${error}`);
         } finally {
             await myAgent.close();
             rl.close();

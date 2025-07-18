@@ -1,6 +1,6 @@
 import { logDebug, logError, logInfo, logTitle, logWarn } from "../util/logger.js";
 import MCPClient from "../mcp/mcp-client.js";
-// import OpenAIClient from "./openai-client.js";
+// import OpenAIClient from "../llm/openai-client.js";
 import OpenAIClient from "../llm/llm-client.js";
 
 import { ServerEntry } from "../util/config.js";
@@ -137,6 +137,8 @@ export default class AnyNameAgent {
 
                     // 工具调用后，重新发起新的 stream，请求后续内容
                     break; // break for-await, go to next while-loop
+                } else if(chunk.startsWith("[TOOL_CALL]")) {
+                    logDebug(`[Agent] 正在接收工具`);
                 } else {
                     yield chunk; // 普通内容
                 }
