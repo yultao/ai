@@ -12,6 +12,27 @@ cls;npx tsc;node dist/bot-chat.test.js
 cls;npx tsc;node dist/bot-chat.stream.test.js
 cls;npx tsc;node dist/bot-server.test.js
 ```
+
+                                   llmClient.invokeInvoke => chat/completions
+bot.invokeQuery => agent.invoke => llmClient.invokeStream => chat/completions stream
+bot.streamQuery => agent.stream => llmClient.streamStream => chat/completions stream
+
+```mermaid
+graph LR;
+    bot -- 1 start --> agent;
+    agent -- 2 get tools --> mcp-client -- 3 list tools --> mcp-server;
+    mcp-server -- 4 all tools --> mcp-client -- 5 all tools --> agent;
+
+    agent -- 6 all tools --> llm-client;
+    
+    bot -- 7 chat --> agent;
+    agent -- 8 chat  --> llm-client -- 9 tools  --> agent;
+    agent -- 8 execute tools --> mcp-client -- execute tools --> mcp-server;
+    mcp-server -- 9 result --> mcp-client --10 result--> agent;
+
+    agent -- 11 empty+result  --> llm-client -- 12 content --> agent -- 13 content --> bot;
+
+```
 ---
 
 # 🧠 TT AI Agent

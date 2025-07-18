@@ -46,7 +46,7 @@ export default class AnyNameAgent {
             throw new Error("OpenAI client is not initialized.");
         }
         let res = "";
-        let response = await this.llmClient!.invokeInvoke(prompt);
+        let response = await this.llmClient!.invokeStream(prompt);
         while (true) {
             // console.log("一次调用：要么是tools要么是content： " + JSON.stringify(response));
 
@@ -75,7 +75,7 @@ export default class AnyNameAgent {
                     }
                 }
                 // 工具调用之后，发送空请求？
-                response = await this.llmClient.invokeInvoke();
+                response = await this.llmClient.invokeStream();
 
                 // continue; // Continue to process the next response
             } else {

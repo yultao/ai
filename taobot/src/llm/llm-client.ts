@@ -151,10 +151,12 @@ export default class LLMClient {
           });
         }
       }
+      logDebug("content: " + content);
+      logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
       // res.choices[0].message.toolCalls;
       logTitle("END");
     } catch (err) {
-      logWarn(`Warn invokeChat: ${err}`);
+      logWarn(`Warn invokeInvoke: ${err}`);
     }
 
     //suggested tools by openai
@@ -273,6 +275,11 @@ export default class LLMClient {
       }//end of while
       // console.log("ENDDDD");
       process.stdout.write("\n");
+
+      
+      logDebug("content: " + content);
+      logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
+
       logTitle("END IS");
     } catch (err) {
       logWarn(`Warn invokeStream: ${err}`);
@@ -300,12 +307,11 @@ export default class LLMClient {
         })),
       });
     }
-
     return { content, toolCalls };
   }
 
   public async *streamStream(prompt: string): AsyncGenerator<string, void, unknown> {
-    let accumulated = "";
+    let content = "";
     const suggestedToolCalls = new Map<string, ToolCall>();
     try {
       logTitle("REQUEST STREAM");
@@ -350,7 +356,7 @@ export default class LLMClient {
             }
             // 普通内容
             if (part.choices[0].delta?.content) {
-              accumulated += part.choices[0].delta.content;
+              content += part.choices[0].delta.content;
               yield part.choices[0].delta.content;
             }
 
@@ -380,7 +386,7 @@ export default class LLMClient {
                   const toolCalls = Array.from(suggestedToolCalls.values());
                   this.appendMessages({
                     role: 'assistant',
-                    content: accumulated,//此时accumulated为空
+                    content: content,//此时accumulated为空
                     tool_calls: toolCalls.map(tc => ({
                       type: 'function',
                       id: tc.id,
@@ -391,6 +397,7 @@ export default class LLMClient {
                     })),
                   });
 
+                  logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
                   yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                 }
               }
@@ -404,12 +411,13 @@ export default class LLMClient {
     } catch (err) {
       logWarn(`Warn streamChat: ${err}`);
     }
-    if (accumulated.trim()) {
+    if (content.trim()) {
       this.appendMessages({
         role: 'assistant',
-        content: accumulated,
+        content: content,
       });
     }
+    logDebug("content: " + content);
   }
 
   private async callLLM(stream: boolean) {
