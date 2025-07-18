@@ -195,7 +195,7 @@ export default class Bot {
 
             while (true) {
                 const prompt = await rl.question("> ");
-                if (prompt.trim().toLowerCase() === "exit") {
+                if (prompt.trim().toLowerCase() === "bye") {
                     break;
                 }
                 await myAgent.invoke(prompt);
@@ -219,7 +219,7 @@ export default class Bot {
 
             while (true) {
                 const prompt = await rl.question(">> ");
-                if (prompt.trim().toLowerCase() === "exit") {
+                if (prompt.trim().toLowerCase() === "bye") {
                     break;
                 }
                 const chatStream = myAgent.stream(prompt);

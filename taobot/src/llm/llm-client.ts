@@ -216,13 +216,17 @@ export default class LLMClient {
         buffer = lines.pop() ?? '';
 
         for (const line of lines) {
-          // console.log("line===> " + line);
+          logDebug("line: " + line);
 
           if (line.startsWith('data: ')) {
             const json = line.slice(6).trim();
             if (json === '[DONE]') {
               // console.log("line break")
 
+              break;
+            }
+            if (!json.startsWith("{")) {
+              logWarn("Invalid JSON " + json);
               break;
             }
             const part = JSON.parse(json);
@@ -237,7 +241,7 @@ export default class LLMClient {
             }
 
             if (part.choices[0].delta.tool_calls) {
-              logInfo(':'.repeat(part.choices[0].message.tool_calls.length))
+              logInfo(':'.repeat(part.choices[0].delta.tool_calls.length))
               logDebug(JSON.stringify(part.choices[0].delta.tool_calls))
 
               for (const toolCall of part.choices[0].delta.tool_calls) {
@@ -267,7 +271,7 @@ export default class LLMClient {
                     currentToolCall!.function.arguments += toolCall.function.arguments;
                   }
                 }
-                logInfo("currentToolCall: " + currentToolCall)
+                logDebug("currentToolCall: " + JSON.stringify(currentToolCall))
 
               }// end for each tool call
             }//handle tools
@@ -323,7 +327,6 @@ export default class LLMClient {
       } else {
         logInfo("No prompt");
       }
-      logDebug("req: " + JSON.stringify(this.messages));
 
 
       const body = await this.callLLM(true);
@@ -350,6 +353,10 @@ export default class LLMClient {
               // console.log("line break")
               break;
             }
+            if (!json.startsWith("{")) {
+              logWarn("Invalid JSON " + json);
+              break;
+            }
             const part = JSON.parse(json);
             // logDebug(JSON.stringify(part));
             if (!part.choices) {
@@ -364,9 +371,9 @@ export default class LLMClient {
 
             // 工具调用内容
             if (part.choices[0].delta.tool_calls) {
-
+              logDebug(JSON.stringify(part.choices[0].delta.tool_calls))
               for (const toolCall of part.choices[0].delta.tool_calls) {
-                const key = toolCall.index +"";
+                const key = toolCall.index + "";
 
                 if (!suggestedToolCalls.has(key)) {
                   suggestedToolCalls.set(key, {
@@ -385,7 +392,7 @@ export default class LLMClient {
                 const toolName = current.function.name;
                 const args = current.function.arguments;
                 //一旦得到toolcall，立即存入历史
-                if (toolName && args) {
+                if (toolName && args && args.startsWith("{") && args.endsWith("}")) {
                   const toolCalls = Array.from(suggestedToolCalls.values());
                   this.appendMessages({
                     role: 'assistant',
@@ -399,6 +406,7 @@ export default class LLMClient {
                       },
                     })),
                   });
+                logInfo(`[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`)
 
                   logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
                   yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
@@ -415,7 +423,7 @@ export default class LLMClient {
       yield "\n";
       logTitle("END STREAM");
     } catch (err) {
-      logWarn(`Warn streamChat: ${err}`);
+      logWarn(`Warn streamStream: ${err}`);
     }
     if (content.trim()) {
       this.appendMessages({
@@ -429,18 +437,20 @@ export default class LLMClient {
   private async callLLM(stream: boolean) {
     const url = `${this.apiBaseURL}/chat/completions`;
     // console.log(url);
+    const body = JSON.stringify({
+      model: this.model,
+      messages: this.messages,
+      stream: stream,
+      tools: this.availableTools, //tell openai the available tools
+    });
+    logDebug("req: " + body);
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: this.model,
-        messages: this.messages,
-        stream: stream,
-        tools: this.availableTools, //tell openai the available tools
-      })
+      body: body
     });
 
     // ✅ 检查 res.body 是否存在
