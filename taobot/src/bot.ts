@@ -27,10 +27,11 @@ export default class Bot {
     private async createAgent(knowledgeDir: string = "knowledge", prompt?: string) {
         logInfo("Starting my-agent...");
         // Parse command line arguments
-        const args = process.argv.slice(2);
-        logInfo(`Using args: ${JSON.stringify(args)}`);
 
-        const aiConfig = new Config(this.configPath);
+        const aiConfig = new Config(this.configPath);4
+        const preferecneConfig = aiConfig.getPreferecneConfig();
+        logInfo(`Using preferecnes: ${JSON.stringify(preferecneConfig)}`);
+
         const servers = aiConfig.getMcpServerConfigs();
         const mcpServers = servers.filter(server => !server.disabled);
         logInfo(`Using MCP servers: ${JSON.stringify(mcpServers.map(s => s.name))}`);
@@ -46,8 +47,7 @@ export default class Bot {
         logInfo(`Using Provider API Key: ${apiKey.slice(0, 5) + '*'.repeat(Math.min(10, apiKey.length - 5))}`);
         logInfo(`Using Provider API Base URL: ${apiBaseURL}`);
         const { name: modelName, config: modelConfig } = aiConfig.getEnabledModel();
-        const model = args[0] || modelName;
-        logInfo(`Using LLM model: ${model}`);
+        logInfo(`Using LLM model: ${modelName}`);
 
 
         const systemPrompt = "You are an AI assitant";
@@ -63,7 +63,7 @@ export default class Bot {
         // const context = await knowledgeContext.retrieveContext(prompt);
         const context = "";
 
-        const myAgent = new Agent(mcpServers, apiKey, apiBaseURL, model, systemPrompt, context);
+        const myAgent = new Agent(mcpServers, preferecneConfig.llmClientType, apiKey, apiBaseURL, modelName, systemPrompt, context);
 
 
         await myAgent.init();
@@ -195,7 +195,13 @@ export default class Bot {
 
             while (true) {
                 const prompt = await rl.question("> ");
-                if (prompt.trim().toLowerCase() === "bye") {
+                if (
+                    prompt.trim().toLowerCase() === "bye"
+                    || prompt.trim().toLowerCase() === "exit"
+                    || prompt.trim().toLowerCase() === "quit"
+                    || prompt.trim().toLowerCase() === ":q"
+                    || prompt.trim().toLowerCase() === ":x"
+                ) {
                     break;
                 }
                 await myAgent.invoke(prompt);
@@ -219,7 +225,13 @@ export default class Bot {
 
             while (true) {
                 const prompt = await rl.question(">> ");
-                if (prompt.trim().toLowerCase() === "bye") {
+                if (
+                    prompt.trim().toLowerCase() === "bye"
+                    || prompt.trim().toLowerCase() === "exit"
+                    || prompt.trim().toLowerCase() === "quit"
+                    || prompt.trim().toLowerCase() === ":q"
+                    || prompt.trim().toLowerCase() === ":x"
+                ) {
                     break;
                 }
                 const chatStream = myAgent.stream(prompt);

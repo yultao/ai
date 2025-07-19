@@ -1,4 +1,4 @@
-import LLMClient from './llm-client.js';
+import HTTPClient from './http-client.js';
 import dotenv from 'dotenv';
 import MCPClient from "../mcp/mcp-client.js";
 
@@ -15,7 +15,7 @@ async function invokeInvoke() {
         await client.init();
     }
     const tools = mcpClients.flatMap(client => client.getTools());
-    const client = new LLMClient(apiKey, apiBaseURL, model, tools, "", "");
+    const client = new HTTPClient(apiKey, apiBaseURL, model, tools, "", "");
     const response = await client.invokeInvoke("get my slack channels");
     console.log("content:", response.content); 
     console.log("toolCalls:", response.toolCalls); 
@@ -37,7 +37,7 @@ async function invokeStream() {
         await client.init();
     }
     const tools = mcpClients.flatMap(client => client.getTools());
-    const client = new LLMClient(apiKey, apiBaseURL, model, tools, "", "");
+    const client = new HTTPClient(apiKey, apiBaseURL, model, tools, "", "");
     const response = await client.invokeStream("");
 
     console.log("content:", response.content); 
@@ -62,7 +62,7 @@ async function streamStream() {
         await client.init();
     }
     const tools = mcpClients.flatMap(client => client.getTools());
-    const client = new LLMClient(apiKey, apiBaseURL, model, tools, "", "");
+    const client = new HTTPClient(apiKey, apiBaseURL, model, tools, "", "");
     const stream = client.streamStream("show my slack channels using available mcp tools");
 
     for await (const chunk of stream) {

@@ -1,6 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
+interface PreferenceConfig {
+  llmClientType: string;
+}
 interface McpServerConfig {
   command: string;
   args: string[];
@@ -18,6 +21,7 @@ interface EmbeddingConfig {
   apiKey: string;
   apiBaseURL: string;
 }
+
 interface ModelConfig {
   name: string;
   description?: string;
@@ -25,7 +29,7 @@ interface ModelConfig {
   enabled?: boolean; // new optional field
 }
 interface Config {
-  // model: string;
+  preferences: PreferenceConfig;
   models: { [key: string]: ModelConfig };
   mcpServers: {
     [name: string]: McpServerConfig;
@@ -60,39 +64,41 @@ export default class AnyNameConfig {
     return config;
   }
 
-getEnabledModel(): { name: string; config: any } {
-  const config = this.readConfig();
+  getPreferecneConfig() : PreferenceConfig{
+    return this.config.preferences;
 
-  const entry = Object.entries(config.models).find(
-    ([_, model]) => model.enabled === true
-  );
-
-  if (!entry) {
-    throw new Error("No enabled model found in config.models.");
   }
+  getEnabledModel(): { name: string; config: any } {
 
-  const [name, modelConfig] = entry;
-  return { name, config: modelConfig };
-}
+    const entry = Object.entries(this.config.models).find(
+      ([_, model]) => model.enabled === true
+    );
+
+    if (!entry) {
+      throw new Error("No enabled model found in config.models.");
+    }
+
+    const [name, modelConfig] = entry;
+    return { name, config: modelConfig };
+  }
 
   getEmbeddingConfig(): EmbeddingConfig {
     return this.config.embedding;
   }
 
-getEnabledApiProvider(): { name: string; config: ApiProviderConfig } {
-  const config = this.readConfig();
+  getEnabledApiProvider(): { name: string; config: ApiProviderConfig } {
 
-  const entry = Object.entries(config.apiProviders).find(
-    ([_, provider]) => provider.enabled === true
-  );
+    const entry = Object.entries(this.config.apiProviders).find(
+      ([_, provider]) => provider.enabled === true
+    );
 
-  if (!entry) {
-    throw new Error("No enabled API provider found.");
+    if (!entry) {
+      throw new Error("No enabled API provider found.");
+    }
+
+    const [name, providerConfig] = entry;
+    return { name, config: providerConfig };
   }
-
-  const [name, providerConfig] = entry;
-  return { name, config: providerConfig };
-}
   getMcpServerConfigs(): ServerEntry[] {
     const servers: ServerEntry[] = Object.entries(this.config.mcpServers).map(
       ([name, { command, args, disabled }]) => ({

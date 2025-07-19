@@ -8,7 +8,7 @@ export interface ToolCall {
     arguments: string;
   };
 }
-export default class LLMClient {
+export default class HTTPClient {
   private apiBaseURL: string;
   private apiKey: string;
   private model: string;

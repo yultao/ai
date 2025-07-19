@@ -31,13 +31,83 @@ export default class OpenAIClient {
     }
 
     async invokeInvoke(prompt?: string) {
-        return this.invokeStream(prompt);//todo 
+        let content = '';
+        const suggestedToolCalls = new Map<string, ToolCall>();
+        try {
+            logTitle("REQUEST");
+            if (prompt) {
+                logInfo(prompt);
+                this.appendMessages({ role: 'user', content: prompt });
+            } else {
+                logInfo("No prompt");
+            }
+            logDebug("messages: "+JSON.stringify(this.messages));
+
+            const response = await this.openai.chat.completions.create({
+                model: this.model,
+                messages: this.messages,
+                tools: this.availableTools,//tell openai the available tools
+            });
+
+
+            logTitle("RESPONSE");
+
+            const choice = response.choices[0];
+
+            if (choice.message.tool_calls?.length) {
+                for (const toolCall of choice.message.tool_calls) {
+                    const { name, arguments: argsJson } = toolCall.function;
+                    logDebug("id "+toolCall.id+", name: "+name+", arguments: "+arguments+", argsJson: "+argsJson);
+
+                    const args = JSON.parse(argsJson);
+
+                    console.log(`🛠 Model wants to call ${name} with:`, args);
+                    const key = toolCall.id + "";
+
+                    suggestedToolCalls.set(key, {
+                        id: toolCall.id,
+                        function: {
+                            name: name,
+                            arguments: argsJson,
+                        },
+                    });
+                }
+            } else {
+                // No tool call, just a normal reply
+                content = choice.message.content +"";
+                console.log('🤖 Assistant:', choice.message.content);
+            }
+
+            logDebug("content: " + content);
+            logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
+
+
+            logTitle("END");
+
+        } catch (err) {
+            logWarn(`Warn invokeInvoke: ${err}`);
+        }
+
+        //suggested tools by openai
+        let toolCalls: ToolCall[] = Array.from(suggestedToolCalls.values());
+        // push the final message to the messages array
+        this.appendMessages({
+            role: 'assistant',
+            content,
+            tool_calls: toolCalls.map(toolCall => ({
+                type: 'function',
+                id: toolCall.id,
+                function: {
+                    name: toolCall.function.name,
+                    arguments: toolCall.function.arguments,
+                },
+            })),
+        });
+
+        return { content, toolCalls };
     }
 
     async invokeStream(prompt?: string) {
-        // logInfo(`this.message.length: ${this.messages.length}`);
-
-
         let content = '';
         const suggestedToolCalls = new Map<string, ToolCall>();
         try {
@@ -71,7 +141,7 @@ export default class OpenAIClient {
                 if (part.choices[0].delta.tool_calls) {
                     for (const toolCall of part.choices[0].delta.tool_calls) {
 
-                        const key = toolCall.id || "";
+                        const key = toolCall.index + "";
                         if (!suggestedToolCalls.has(key)) {
                             suggestedToolCalls.set(key, {
                                 id: '',
@@ -205,7 +275,7 @@ export default class OpenAIClient {
             // yield "\n";
             logTitle("END STREAM");
         } catch (err) {
-            logWarn(`Warn streamStream: ${err}`);
+            logWarn(`Warn streamStream openai: ${err}`);
         }
         if (content.trim()) {
             this.appendMessages({
@@ -216,8 +286,8 @@ export default class OpenAIClient {
         logDebug("content: " + content);
     }
     private isLikelyCompleteJson(str: string): boolean {
+        logDebug("isLikelyCompleteJson: " + str);
         if (!str.startsWith('{') || !str.endsWith('}')) return false;
-
         try {
             const parsed = JSON.parse(str);
             return typeof parsed === 'object' && parsed !== null;

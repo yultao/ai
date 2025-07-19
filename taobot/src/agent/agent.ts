@@ -1,13 +1,14 @@
 import { logDebug, logError, logInfo, logTitle, logWarn } from "../util/logger.js";
 import MCPClient from "../mcp/mcp-client.js";
-// import OpenAIClient from "../llm/openai-client.js";
-import OpenAIClient from "../llm/llm-client.js";
+import OpenAIClient from "../llm/openai-client.js";
+import HTTPClient from "../llm/http-client.js";
 
 import { ServerEntry } from "../util/config.js";
 export default class AnyNameAgent {
     private mcpServers: ServerEntry[];
     private mcpClients: MCPClient[] = [];
-    private llmClient: OpenAIClient | null = null; // Replace with actual type
+    private llmClient: OpenAIClient | HTTPClient | null = null; // Replace with actual type
+    private llmClientType: string;
     private model: string;
     private apiKey: string;
     private apiBaseURL: string;
@@ -15,14 +16,15 @@ export default class AnyNameAgent {
     private context: string;
     constructor(
         mcpServers: ServerEntry[],
+        llmClientType: string,
         apiKey: string,
         apiBaseURL: string,
         model: string,
         systemPrompt: string,
         context: string
     ) {
+        this.llmClientType = llmClientType;
         this.mcpServers = mcpServers;
-        // this.mcpClients = mcpClients;
         this.model = model;
         this.apiKey = apiKey;
         this.apiBaseURL = apiBaseURL;
@@ -37,7 +39,9 @@ export default class AnyNameAgent {
             await client.init();
         }
         const tools = this.mcpClients.flatMap(client => client.getTools());
-        this.llmClient = new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
+        this.llmClient = this.llmClientType === "http"
+            ? new HTTPClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context)
+            : new OpenAIClient(this.apiKey, this.apiBaseURL, this.model, tools, this.systemPrompt, this.context);
 
     }
 
@@ -137,7 +141,7 @@ export default class AnyNameAgent {
 
                     // 工具调用后，重新发起新的 stream，请求后续内容
                     break; // break for-await, go to next while-loop
-                } else if(chunk.startsWith("[TOOL_CALL]")) {
+                } else if (chunk.startsWith("[TOOL_CALL]")) {
                     logDebug(`[Agent] 正在接收工具`);
                 } else {
                     yield chunk; // 普通内容

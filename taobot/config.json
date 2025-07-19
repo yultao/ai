@@ -1,9 +1,12 @@
 {
+  "preferences": {
+    "llmClientType": "openai"
+  },
   "apiProviders": {
     "openrouter": {
       "apiKey": "OPENROUTER_API_KEY",
       "apiBaseURL": "https://openrouter.ai/api/v1",
-      "enabled": true
+      "enabled": false
     },
     "groq": {
       "apiKey": "GROQ_API_KEY",
@@ -13,9 +16,10 @@
   },
   "models": {
     "deepseek/deepseek-chat-v3-0324:free": {
-      "enabled": true
+      "enabled": false
     },
     "meta-llama/llama-4-scout-17b-16e-instruct": {
+      "name": "Meta Llama 4",
       "enabled": true
     }
   },

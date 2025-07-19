@@ -43,7 +43,7 @@ async function testAgent() {
     
     const knowledgeContext = new KnowledgeContext(embeddingConfig.model, knowledgeDir);
     const context = await knowledgeContext.retrieveContext(prompt);
-    const myAgent = new MyAgent(mcpServers, providerApiKey, providerApiBaseURL, model, systemPrompt, context);
+    const myAgent = new MyAgent(mcpServers, "http", providerApiKey, providerApiBaseURL, model, systemPrompt, context);
     await myAgent.init();
     let response;
 

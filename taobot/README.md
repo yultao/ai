@@ -13,7 +13,7 @@ cls;npx tsc;node dist/bot-chat.stream.test.js
 cls;npx tsc;node dist/bot-server.test.js
 ```
 
-                                   llmClient.invokeInvoke => chat/completions
+            (for debug purpose) => llmClient.invokeInvoke => chat/completions
 bot.invokeQuery => agent.invoke => llmClient.invokeStream => chat/completions stream
 bot.streamQuery => agent.stream => llmClient.streamStream => chat/completions stream
 
