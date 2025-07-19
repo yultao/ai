@@ -178,7 +178,7 @@ export default class OpenAIClient {
             logTitle("END IS");
 
         } catch (err) {
-            logWarn(`Warn chat: ${err}`);
+            logWarn(`Warn invokeStream: ${err}`);
         }
 
         //suggested tools by openai
@@ -275,7 +275,7 @@ export default class OpenAIClient {
             // yield "\n";
             logTitle("END STREAM");
         } catch (err) {
-            logWarn(`Warn streamStream openai: ${err}`);
+            logWarn(`Warn streamStream: ${err}`);
         }
         if (content.trim()) {
             this.appendMessages({

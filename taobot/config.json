@@ -1,6 +1,6 @@
 {
   "preferences": {
-    "llmClientType": "http"
+    "llmClientType": "openai"
   },
   "apiProviders": {
     "openrouter": {
@@ -20,6 +20,9 @@
     },
     "meta-llama/llama-4-scout-17b-16e-instruct": {
       "name": "Meta Llama 4",
+      "enabled": false
+    },
+    "deepseek-r1-distill-llama-70b": {
       "enabled": true
     }
   },

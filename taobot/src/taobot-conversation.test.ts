@@ -64,8 +64,10 @@ async function single2() {
     const bot = new TaoBot();
     const agentId1 = "my-agent-id-1";
     await bot.startConversation(agentId1);
-    const res = await bot.continueConversation(agentId1, "show me files in the C:\\Workspace\\ai folder");
-    console.log(JSON.stringify(res));
-    // await bot.continueConversation(agentId1, "Where am I");
+    console.log(await bot.continueConversation(agentId1, "你是一个资深 QA 工程师。"));
+    console.log(await bot.continueConversation(agentId1, "请根据User story生成结构化的 JSON 格式测试用例，包括正常流程、边界值、异常情况等。User story: As a user, I want to reset my password via email so that I can access my account again."));
+    console.log(await bot.continueConversation(agentId1, "请将这些测试用例写到knowledge/testcases.json"));
+    console.log(await bot.continueConversation(agentId1, "请将knowledge/testcases.json转换成Excel格式保存到knowledge/testcases.xlsx"));
+
     await bot.stopConversation(agentId1);
 }
