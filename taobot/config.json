@@ -1,6 +1,6 @@
 {
   "preferences": {
-    "llmClientType": "openai"
+    "llmClientType": "http"
   },
   "apiProviders": {
     "openrouter": {

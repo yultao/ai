@@ -13,6 +13,3 @@ console.log(process.env.SLACK_USER_SIGNING_SECRET);
     console.log("Available tools:", tools.map(tool => tool.name));
     mcpClient.close();
 }
-test('ask and answer', () => {
-    expect(main()).toBe(3);
-});

@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 
 
-import Bot from './bot.js';
+import TaoBot from './taobot.js';
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 const conversations: Record<string, OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = {};
-const bot = new Bot();
+const bot = new TaoBot();
 
 app.post("/chat/:chatId", async (req: any, res: any) => {
     res.setHeader("Content-Type", "text/event-stream");

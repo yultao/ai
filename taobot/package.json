@@ -6,13 +6,18 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "query": "cls; npx tsc; node dist/taobot-query.test.js",
+    "query-stream": "cls; npx tsc; node dist/taobot-query.test.js stream",
+    "conv": "cls; npx tsc; node dist/taobot-conversation.test.js",
+    "conv-stream": "cls; npx tsc; node dist/taobot-conversation.test.js stream",
+    "chat": "cls; npx tsc; node dist/taobot-chat.test.js",
+    "chat-stream": "cls; npx tsc; node dist/taobot-chat.test.js stream"
   },
   "bin": {
     "taobot": "dist/cli.js"
   },
   "exports": {
-    "./TaoBot": "./dist/bot.js"
+    "./TaoBot": "./dist/taobot.js"
   },
   "files": [
     "dist"
@@ -32,10 +37,7 @@
     "@modelcontextprotocol/sdk": "^1.15.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jest": "^30.0.0",
     "@types/node-fetch": "^2.6.12",
-    "jest": "^30.0.4",
-    "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

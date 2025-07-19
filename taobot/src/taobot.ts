@@ -1,23 +1,16 @@
 
-// import MCPClient from './mcp-client.js';
-import Agent from './agent/agent.js';
-import { logInfo, logError } from "./util/logger.js";
 import Config from './util/config.js';
-import { createInterface } from "readline/promises";
+import Agent from './agent/agent.js';
 import KnowledgeContext from './rag/knowledge-context.js';
+import { logInfo, logError } from "./util/logger.js";
+import { createInterface } from "readline/promises";
 import dotenv from 'dotenv';
-// interface QueryOptions {
-//     knowledgeDir?: string;
-//     stream?: boolean;
-// }
-export default class Bot {
+
+export default class TaoBot {
     private configPath: string;
-
-
     constructor(aiConfigPath: string = "config.json") {
         this.configPath = aiConfigPath;
     }
-
     /**
      * Create an agent
      * @param knowledgeDir - always try to retrieve context from knowledgeDir 
@@ -70,28 +63,6 @@ export default class Bot {
         return myAgent;
     }
 
-    // public query(
-    //     prompt: string,
-    //     options: QueryOptions & { stream: true }
-    // ): AsyncGenerator<string, void, unknown>;
-
-    // public query(
-    //     prompt: string,
-    //     options?: QueryOptions & { stream?: false }
-    // ): Promise<string>;
-
-    // public async *query(
-    //     prompt: string,
-    //     options: QueryOptions = {}
-    // ): Promise<string> | AsyncGenerator<string, void, unknown> {
-    //     const { knowledgeDir, stream } = options;
-
-    //     if (stream) {
-    //         return this.streamQuery(prompt, knowledgeDir);
-    //     } else {
-    //         return this.invokeQuery(prompt, knowledgeDir);
-    //     }
-    // }
     /*
     scenario 1: single question, based on a specific knowledge context
     */
@@ -163,25 +134,6 @@ export default class Bot {
         await this.agents[agentId].close();
     }
 
-
-    // public chat(
-    //     options: QueryOptions & { stream: true }
-    // ): AsyncGenerator<string, void, unknown>;
-
-    // public chat(
-    //     options?: QueryOptions & { stream?: false }
-    // ): Promise<string>;
-    // public async *chat(
-    //     options: QueryOptions = {}
-    // ): Promise<string> | AsyncGenerator<string, void, unknown> {
-    //     const { knowledgeDir, stream } = options;
-
-    //     if (stream) {
-    //         return this.streamChat(knowledgeDir);
-    //     } else {
-    //         return this.invokeChat(knowledgeDir);
-    //     }
-    // }
     /**
      * scenario 3: self-loop conversation, based on a full knowledge context
      */
