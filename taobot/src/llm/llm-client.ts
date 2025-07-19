@@ -392,7 +392,7 @@ export default class LLMClient {
                 const toolName = current.function.name;
                 const args = current.function.arguments;
                 //一旦得到toolcall，立即存入历史
-                if (toolName && args && args.startsWith("{") && args.endsWith("}")) {
+                if (toolName && args && this.isLikelyCompleteJson(args)) {
                   const toolCalls = Array.from(suggestedToolCalls.values());
                   this.appendMessages({
                     role: 'assistant',
@@ -406,7 +406,7 @@ export default class LLMClient {
                       },
                     })),
                   });
-                logInfo(`[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`)
+                  logInfo(`[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`)
 
                   logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
                   yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
@@ -416,8 +416,14 @@ export default class LLMClient {
           }//if (line.startsWith('data: ')) {
           else {
             //logDebug("not start with data: " + line);
+            if(": OPENROUTER PROCESSING"===line) {
+              process.stdout.write("[..]");
+            } else {
+              process.stdout.write("["+line+"]");
+            }
           }
         }//for (const line of lines) {
+
       }
       process.stdout.write("\n");
       yield "\n";
@@ -433,7 +439,16 @@ export default class LLMClient {
     }
     logDebug("content: " + content);
   }
+  private isLikelyCompleteJson(str: string): boolean {
+    if (!str.startsWith('{') || !str.endsWith('}')) return false;
 
+    try {
+      const parsed = JSON.parse(str);
+      return typeof parsed === 'object' && parsed !== null;
+    } catch {
+      return false;
+    }
+  }
   private async callLLM(stream: boolean) {
     const url = `${this.apiBaseURL}/chat/completions`;
     // console.log(url);

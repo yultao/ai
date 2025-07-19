@@ -21,7 +21,7 @@
   },
   "mcpServers": {
     "fetch": {
-      "disabled": true,
+      "disabled": false,
       "command": "uvx",
       "args": [
         "mcp-server-fetch"
@@ -44,6 +44,13 @@
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "C:\\Workspace\\ai"
+      ]
+    },
+    "excel": {
+      "disabled": false,
+      "command": "node",
+      "args": [
+       "C:/Workspace/ai/excel-mcp-server/dist/index.js"
       ]
     }
   },

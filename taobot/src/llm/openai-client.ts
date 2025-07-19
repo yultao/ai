@@ -101,8 +101,8 @@ export default class OpenAIClient {
             }//handle stream end
             process.stdout.write("\n");
 
-      logDebug("content: " + content);
-      logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
+            logDebug("content: " + content);
+            logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
 
 
             logTitle("END IS");
@@ -161,9 +161,9 @@ export default class OpenAIClient {
                 // 工具调用内容
                 if (part.choices[0].delta.tool_calls) {
                     logInfo(':'.repeat(part.choices[0].delta.tool_calls.length))
-                    logDebug("part: "+JSON.stringify(part.choices[0].delta.tool_calls))
+                    logDebug("part: " + JSON.stringify(part.choices[0].delta.tool_calls))
                     for (const toolCall of part.choices[0].delta.tool_calls) {
-                        const key = toolCall.index +"";
+                        const key = toolCall.index + "";
                         if (!suggestedToolCalls.has(key)) {
                             suggestedToolCalls.set(key, {
                                 id: '',
@@ -181,7 +181,7 @@ export default class OpenAIClient {
                         const toolName = current.function.name;
                         const args = current.function.arguments;
                         //一旦得到toolcall，立即存入历史
-                        if (toolName && args) {
+                        if (toolName && args && this.isLikelyCompleteJson(args)) {
                             const toolCalls = Array.from(suggestedToolCalls.values());
                             this.appendMessages({
                                 role: 'assistant',
@@ -215,7 +215,16 @@ export default class OpenAIClient {
         }
         logDebug("content: " + content);
     }
+    private isLikelyCompleteJson(str: string): boolean {
+        if (!str.startsWith('{') || !str.endsWith('}')) return false;
 
+        try {
+            const parsed = JSON.parse(str);
+            return typeof parsed === 'object' && parsed !== null;
+        } catch {
+            return false;
+        }
+    }
     private getOpenAITools(): any {
         const openapiTools = this.tools.map(tool => ({
             type: 'function',
