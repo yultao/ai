@@ -1,19 +1,15 @@
 import express from "express";
 import cors from "cors";
-import { OpenAI } from "openai";
 import dotenv from 'dotenv';
-
-
-
-
 import TaoBot from './taobot.js';
+
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 
-const conversations: Record<string, OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = {};
+const conversations: Record<string, string> = {};// 用于存储对话历史记录，键为 chatId，值为对话内容。只要server重启，这个记录就会被清空。
 const bot = new TaoBot();
 
 app.post("/chat/:chatId", async (req: any, res: any) => {
@@ -24,31 +20,29 @@ app.post("/chat/:chatId", async (req: any, res: any) => {
     try {
         const chatId = req.params.chatId || "default-chat-id";
         const userMessage = req.body.message;
-        
+
         // 先将用户的问题加入历史记录
         if (!conversations[chatId]) {
-            conversations[chatId] = [
-                { role: "system", content: "You are a helpful assistant." }
-            ];
+            conversations[chatId] = new Date().toISOString();
             await bot.startConversation(chatId);//开启一个新的对话
         }
 
         const chatStream = bot.streamContinueConversation(chatId, userMessage);
 
         let fullResponse = "";
-        res.write("data: "+ chatId +": \n\n");
+        res.write("data: " + chatId + ": \n\n");
 
         for await (const chunk of chatStream) {
             fullResponse += chunk;
             // console.log(`data: ${chunk}\n\n`);
             res.write(`data: ${chunk}\n\n`);
         }
-       
-        res.write("data: [DONE]\n\n");
-        res.end();
+
+        // res.write("data: [DONE]\n\n");
+
     } catch (err) {
         console.error("OpenAI error:", err);
-        res.write("data: [ERROR]\n\n");
+    } finally {
         res.end();
     }
 });
