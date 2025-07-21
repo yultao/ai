@@ -416,11 +416,11 @@ export default class HTTPClient {
           }//if (line.startsWith('data: ')) {
           else {
             //logDebug("not start with data: " + line);
-            if(": OPENROUTER PROCESSING"===line) {
-              process.stdout.write("[..]");
-            } else {
-              process.stdout.write("["+line+"]");
-            }
+            // if(": OPENROUTER PROCESSING"===line) {
+            //   process.stdout.write("[..]");
+            // } else {
+            //   process.stdout.write("["+line+"]");
+            // }
           }
         }//for (const line of lines) {
 

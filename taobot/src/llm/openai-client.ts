@@ -41,7 +41,7 @@ export default class OpenAIClient {
             } else {
                 logInfo("No prompt");
             }
-            logDebug("messages: "+JSON.stringify(this.messages));
+            logDebug("messages: " + JSON.stringify(this.messages));
 
             const response = await this.openai.chat.completions.create({
                 model: this.model,
@@ -57,7 +57,7 @@ export default class OpenAIClient {
             if (choice.message.tool_calls?.length) {
                 for (const toolCall of choice.message.tool_calls) {
                     const { name, arguments: argsJson } = toolCall.function;
-                    logDebug("id "+toolCall.id+", name: "+name+", arguments: "+arguments+", argsJson: "+argsJson);
+                    logDebug("id " + toolCall.id + ", name: " + name + ", arguments: " + arguments + ", argsJson: " + argsJson);
 
                     const args = JSON.parse(argsJson);
 
@@ -74,7 +74,7 @@ export default class OpenAIClient {
                 }
             } else {
                 // No tool call, just a normal reply
-                content = choice.message.content +"";
+                content = choice.message.content + "";
                 console.log('🤖 Assistant:', choice.message.content);
             }
 
@@ -217,7 +217,8 @@ export default class OpenAIClient {
                 stream: true,
                 tools: this.availableTools,
             });
-            logDebug("req: " + JSON.stringify(this.messages));
+            logDebug("req: " + JSON.stringify(this.messages)
+                + ", tools: " + JSON.stringify(this.availableTools));
 
             logTitle("RESPONSE STREAM");
             for await (const part of stream) {
@@ -265,14 +266,15 @@ export default class OpenAIClient {
                                     },
                                 })),
                             });
+                            logInfo(`[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`)
                             logDebug("suggestedToolCalls: " + JSON.stringify(Array.from(suggestedToolCalls)));
                             yield `[TOOL_CALL][ID=${toolId}][NAME=${toolName}][ARGS=${args}]`;
                         }
                     }
                 }//if tools
             }
-            // process.stdout.write("\n");
-            // yield "\n";
+            process.stdout.write("\n");
+            yield "\n";
             logTitle("END STREAM");
         } catch (err) {
             logWarn(`Warn streamStream: ${err}`);
@@ -286,7 +288,6 @@ export default class OpenAIClient {
         logDebug("content: " + content);
     }
     private isLikelyCompleteJson(str: string): boolean {
-        logDebug("isLikelyCompleteJson: " + str);
         if (!str.startsWith('{') || !str.endsWith('}')) return false;
         try {
             const parsed = JSON.parse(str);

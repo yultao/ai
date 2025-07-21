@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taobot Chat</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    #chat-box {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      height: 70vh;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    .message {
+      display: flex;
+      margin: 10px 0;
+    }
+    .message.user {
+      justify-content: flex-end;
+    }
+    .message.assistant {
+      justify-content: flex-start;
+    }
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+      white-space: pre-wrap;
+    }
+    .user .bubble {
+      background-color: #d2eafc;
+    }
+    .assistant .bubble {
+      background-color: #e2e2e2;
+    }
+    #input-container {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+    }
+    #message-input {
+      flex: 1;
+      background-color: #d2eafc;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      padding-right: 60px;
+      box-sizing: border-box;
+    }
+    #send-button {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      height: 30px;
+      padding: 0 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🧠 Taobot Chat</h2>
+  <div id="chat-box">
+    <!-- Messages will appear here -->
+    <div id="bottom-ref"></div>
+  </div>
+
+  <div id="input-container">
+    <textarea
+      id="message-input"
+      rows="2"
+      placeholder="Type your message..."
+    ></textarea>
+    <button id="send-button">Send</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+    const bottomRef = document.getElementById("bottom-ref");
+
+    const chatId = Date.now();
+    let messages = [];
+    let loading = false;
+
+    function renderMessages() {
+      // Clear old messages
+      chatBox.innerHTML = '';
+      messages.forEach(msg => {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${msg.role}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerHTML = marked.parse(msg.content);
+
+        messageDiv.appendChild(bubble);
+        chatBox.appendChild(messageDiv);
+      });
+      chatBox.appendChild(bottomRef);
+      bottomRef.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function handleSend() {
+      if (loading || !messageInput.value.trim()) return;
+
+      const inputText = messageInput.value.trim();
+      messages.push({ role: "user", content: inputText });
+      messageInput.value = '';
+      renderMessages();
+      loading = true;
+      sendButton.textContent = '...';
+
+      let fullResponse = "";
+
+      const res = await fetch("http://localhost:3001/chat/" + chatId, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: inputText }),
+      });
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value);
+        const matches = text.match(/data: (.*)/g);
+        if (matches) {
+          matches.forEach((line) => {
+            const content = line.replace(/^data: /, "");
+            fullResponse += content;
+
+            // Update last assistant message or add new one
+            if (
+              messages.length === 0 ||
+              messages[messages.length - 1].role !== "assistant"
+            ) {
+              messages.push({ role: "assistant", content: fullResponse });
+            } else {
+              messages[messages.length - 1].content = fullResponse;
+            }
+
+            renderMessages();
+          });
+        }
+      }
+
+      loading = false;
+      sendButton.textContent = 'Send';
+    }
+
+    sendButton.addEventListener("click", handleSend);
+
+    messageInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.altKey) {
+        e.preventDefault();
+        handleSend();
+      }
+      if (e.key === "Enter" && e.altKey) {
+        e.preventDefault();
+        messageInput.value += "\n";
+      }
+    });
+  </script>
+</body>
+</html>
