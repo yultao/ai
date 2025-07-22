@@ -1,0 +1,50 @@
+[
+  {
+    "test_case_id": "TC1",
+    "description": "Verify the system can handle a valid email and send a reset link.",
+    "steps": [
+      "Submit a POST request to `/api/v1/password-reset` with the body `{ \"email\": \"user@example.com\" }`.",
+      "Observe the response."
+    ],
+    "expected_result": {
+      "status_code": 200,
+      "message": "Reset link sent successfully."
+    }
+  },
+  {
+    "test_case_id": "TC2",
+    "description": "Verify the system handles a non-existent email gracefully.",
+    "steps": [
+      "Submit a POST request to `/api/v1/password-reset` with the body `{ \"email\": \"nonexistent@example.com\" }`.",
+      "Observe the response."
+    ],
+    "expected_result": {
+      "status_code": 404,
+      "message": "User not found."
+    }
+  },
+  {
+    "test_case_id": "TC3",
+    "description": "Verify the system rejects malformed email addresses.",
+    "steps": [
+      "Submit a POST request to `/api/v1/password-reset` with the body `{ \"email\": \"abc@com@\" }`.",
+      "Observe the response."
+    ],
+    "expected_result": {
+      "status_code": 400,
+      "message": "Invalid email format."
+    }
+  },
+  {
+    "test_case_id": "TC4",
+    "description": "Verify the system handles an empty email field.",
+    "steps": [
+      "Submit a POST request to `/api/v1/password-reset` with the body `{ \"email\": \"\" }`.",
+      "Observe the response."
+    ],
+    "expected_result": {
+      "status_code": 400,
+      "message": "Email field is required."
+    }
+  }
+]
